@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
+
 
 // ── MATCH DATA — Programme officiel CDM 2026 — Heures UTC (source: FIFA/KickoffClock) ──
 // Affichage automatique en heure marocaine (Africa/Casablanca = GMT+1) via toLocaleString
