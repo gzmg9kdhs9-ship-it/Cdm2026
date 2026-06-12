@@ -2,7 +2,7 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_KEY;
 
 async function dbGet(key) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/cdm2026?key=eq.${key}&select=value`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/cdm2026?key=eq.${key}&select=value&order=id.desc&limit=1`, {
     headers: {
       "apikey": SUPABASE_KEY,
       "Authorization": `Bearer ${SUPABASE_KEY}`,
@@ -14,7 +14,7 @@ async function dbGet(key) {
 }
 
 async function dbSet(key, value) {
-  await fetch(`${SUPABASE_URL}/rest/v1/cdm2026`, {
+  const res = await fetch(`${SUPABASE_URL}/rest/v1/cdm2026?on_conflict=key`, {
     method: "POST",
     headers: {
       "apikey": SUPABASE_KEY,
@@ -24,6 +24,10 @@ async function dbSet(key, value) {
     },
     body: JSON.stringify({ key, value: JSON.stringify(value) })
   });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Supabase error: ${res.status} ${text}`);
+  }
 }
 
 export default async function handler(req, res) {
