@@ -239,9 +239,12 @@ export default function App() {
   }
 
   async function savePronosForPlayer(player,data){
-    const merged={...pronos,[player]:{...(pronos[player]||{}),...data}};
+    const latest = await dbLoad("pronos") || {};
+    const merged={...latest,[player]:{...(latest[player]||{}),...data}};
     setPronos(merged);await dbSave("pronos",merged);
     showToast(`Pronos de ${player} sauvegardés ✓`);
+  }
+
   }
 
   async function saveResults(data){
