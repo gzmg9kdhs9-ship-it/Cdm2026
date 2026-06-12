@@ -245,8 +245,6 @@ export default function App() {
     showToast(`Pronos de ${player} sauvegardés ✓`);
   }
 
-  }
-
   async function saveResults(data){
     const merged={...results,...data};setResults(merged);await dbSave("results",merged);
     showToast("Résultats sauvegardés ✓");
