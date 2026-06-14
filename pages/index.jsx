@@ -124,7 +124,7 @@ function scoreProno(p,r){
   const pw=ph>pa?"H":ph<pa?"A":"D",rw=rh>ra?"H":rh<ra?"A":"D",ok=pw===rw;
   if(ok&&(ph===rh||pa===ra))return 3;
   if(ok)return 2;
-  if(ph-pa===rh-ra)return 1;
+  if(Math.abs(ph-pa)===Math.abs(rh-ra)&&Math.abs(rh-ra)>0)return 1;
   return 0;
 }
 
@@ -301,7 +301,7 @@ export default function App() {
         <div style={S.center}>
           <div style={{background:"linear-gradient(135deg,#1e3a5f,#0f172a)",border:"2px solid #16a34a",borderRadius:16,padding:"32px 24px",marginBottom:20,textAlign:"center"}}>
             <div style={{fontSize:46,fontWeight:900,marginBottom:6}}>⚽ CDM 2026</div>
-            <div style={{fontSize:13,color:"#94a3b8",letterSpacing:".12em",textTransform:"uppercase"}}>Pronos</div>
+            <div style={{fontSize:13,color:"#94a3b8",letterSpacing:".12em",textTransform:"uppercase"}}>Groupe des 5 · Pronos</div>
           </div>
           {!adminSetup?(
             <div style={S.card}>
