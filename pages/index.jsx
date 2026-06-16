@@ -619,28 +619,34 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
         </button>
       </div>
       {(()=>{
-        const tk=dayKey(new Date().toISOString());
-        const todayNeedsResult=BASE_MATCHES.filter(m=>m.phase===filterPhase&&isLocked(m.kickoff)&&dayKey(m.kickoff)===tk&&(local[m.id]?.home===undefined||local[m.id]?.home===''));
-        if(todayNeedsResult.length===0)return null;
+        const tk=todayKey();
+        const tmKey=(()=>{const d=new Date();d.setDate(d.getDate()+1);const tm=new Date(d.toLocaleString("en-US",{timeZone:TZ}));return `${tm.getFullYear()}-${tm.getMonth()}-${tm.getDate()}`;})();
+        const upcomingMatches=BASE_MATCHES.filter(m=>m.phase===filterPhase&&(dayKey(m.kickoff)===tk||dayKey(m.kickoff)===tmKey)).sort((a,b)=>new Date(a.kickoff)-new Date(b.kickoff));
+        if(upcomingMatches.length===0)return null;
         return(
           <div style={{background:"linear-gradient(135deg,#7a0000,#C1272D)",border:"2px solid #FFD700",borderRadius:14,padding:16,marginBottom:20}}>
-            <div style={{fontFamily:"Impact,sans-serif",fontSize:16,color:"#FFD700",letterSpacing:".1em",marginBottom:12}}>⚡ MATCHS DU JOUR SANS RÉSULTAT ({todayNeedsResult.length})</div>
-            {todayNeedsResult.map(m=>(
-              <div key={m.id} style={{background:"rgba(0,0,0,0.3)",borderRadius:10,padding:"12px 14px",marginBottom:8}}>
-                <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
-                  <span style={{fontSize:11,color:"#FFD700",textTransform:"uppercase",fontWeight:700}}>{m.group||m.phase}</span>
-                  <span style={{fontSize:11,color:"#fbbf24",fontWeight:600}}>🔒 {fmtHour(m.kickoff)}</span>
+            <div style={{fontFamily:"Impact,sans-serif",fontSize:16,color:"#FFD700",letterSpacing:".1em",marginBottom:12}}>⚡ MATCHS AUJOURD'HUI & DEMAIN ({upcomingMatches.length})</div>
+            {upcomingMatches.map(m=>{
+              const started=isLocked(m.kickoff);
+              const done=local[m.id]?.home!==undefined&&local[m.id]?.home!=='';
+              return(
+                <div key={m.id} style={{background:done?"rgba(0,80,0,0.4)":"rgba(0,0,0,0.3)",borderRadius:10,padding:"12px 14px",marginBottom:8,opacity:!started?.7:1}}>
+                  <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                    <span style={{fontSize:11,color:"#FFD700",textTransform:"uppercase",fontWeight:700}}>{m.group||m.phase}</span>
+                    <span style={{fontSize:11,color:started?"#4ade80":"#fbbf24",fontWeight:600}}>{started?"🔒":"⏰"} {fmtHour(m.kickoff)}</span>
+                  </div>
+                  <div style={{display:"flex",alignItems:"center",gap:8}}>
+                    <span style={{flex:1,fontSize:13,fontWeight:700,color:"#fff",textAlign:"center"}}>{m.home}</span>
+                    <input style={{background:started?"rgba(0,0,0,0.4)":"rgba(100,100,100,0.2)",border:`2px solid ${started?"#FFD700":"#666"}`,color:started?"#fff":"#666",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder={started?"?":"–"} disabled={!started} value={local[m.id]?.home??""} onChange={e=>setLocal(l=>({...l,[m.id]:{...l[m.id],home:e.target.value}}))}/>
+                    <span style={{color:"#FFD700",fontWeight:900,fontSize:20}}>–</span>
+                    <input style={{background:started?"rgba(0,0,0,0.4)":"rgba(100,100,100,0.2)",border:`2px solid ${started?"#FFD700":"#666"}`,color:started?"#fff":"#666",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder={started?"?":"–"} disabled={!started} value={local[m.id]?.away??""} onChange={e=>setLocal(l=>({...l,[m.id]:{...l[m.id],away:e.target.value}}))}/>
+                    <span style={{flex:1,fontSize:13,fontWeight:700,color:"#fff",textAlign:"center"}}>{m.away}</span>
+                  </div>
+                  {done&&<div style={{textAlign:"center",fontSize:11,color:"#4ade80",marginTop:4}}>✓ Résultat enregistré</div>}
                 </div>
-                <div style={{display:"flex",alignItems:"center",gap:8}}>
-                  <span style={{flex:1,fontSize:13,fontWeight:700,color:"#fff",textAlign:"center"}}>{m.home}</span>
-                  <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #FFD700",color:"#fff",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="?" value={local[m.id]?.home??""} onChange={e=>setLocal(l=>({...l,[m.id]:{...l[m.id],home:e.target.value}}))}/>
-                  <span style={{color:"#FFD700",fontWeight:900,fontSize:20}}>–</span>
-                  <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #FFD700",color:"#fff",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="?" value={local[m.id]?.away??""} onChange={e=>setLocal(l=>({...l,[m.id]:{...l[m.id],away:e.target.value}}))}/>
-                  <span style={{flex:1,fontSize:13,fontWeight:700,color:"#fff",textAlign:"center"}}>{m.away}</span>
-                </div>
-              </div>
-            ))}
-            <button style={{background:"linear-gradient(135deg,#B8962E,#8B6914)",color:"#000",border:"none",padding:"13px",borderRadius:10,fontSize:15,fontWeight:800,cursor:"pointer",width:"100%",marginTop:4}} onClick={()=>onSave(local)}>💾 Valider les résultats du jour</button>
+              );
+            })}
+            <button style={{background:"linear-gradient(135deg,#B8962E,#8B6914)",color:"#000",border:"none",padding:"13px",borderRadius:10,fontSize:15,fontWeight:800,cursor:"pointer",width:"100%",marginTop:4}} onClick={()=>onSave(local)}>💾 Valider ces résultats</button>
           </div>
         );
       })()}
