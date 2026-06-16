@@ -343,12 +343,12 @@ export default function App() {
             <div style={{position:"absolute",inset:0,zIndex:2,background:"linear-gradient(160deg,rgba(70,0,0,0.5),rgba(0,0,0,0.05),rgba(0,40,10,0.6))",borderRadius:16,pointerEvents:"none"}}/>
             {/* Contenu */}
             <div style={{position:"relative",zIndex:4,display:"flex",flexDirection:"column",alignItems:"center",gap:14,padding:"4px 0"}}>
-              {/* Badge doré en premier */}
-              <div style={{background:"linear-gradient(135deg,#8B6914,#B8962E,#FFD700,#B8962E,#8B6914)",color:"#2a0800",fontFamily:"'Bebas Neue',Impact,sans-serif",fontSize:13,letterSpacing:".15em",padding:"6px 20px",borderRadius:30,boxShadow:"0 4px 20px rgba(184,150,46,0.6)",textAlign:"center",whiteSpace:"nowrap"}}>⚽ PRONOS · COUPE DU MONDE 2026 ⚽</div>
-              {/* Drapeau en dessous, taille réduite */}
-              <div style={{position:"relative",width:100,height:67,animation:"floatflag 4s ease-in-out infinite",filter:"drop-shadow(0 6px 18px rgba(0,0,0,0.8)) drop-shadow(0 0 12px rgba(255,215,0,0.2))"}}>
-                <div style={{position:"absolute",left:-4,top:-5,bottom:-5,width:4,background:"linear-gradient(180deg,#FFD700,#B8962E,#FFD700)",borderRadius:2,boxShadow:"0 0 8px rgba(255,215,0,0.7)"}}/>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:2}} alt="🇲🇦"/>
+              {/* Badge doré */}
+              <div style={{background:"linear-gradient(135deg,#7a5a10,#B8962E,#FFD700,#B8962E,#7a5a10)",color:"#1a0a00",fontFamily:"'Bebas Neue',Impact,sans-serif",fontSize:13,letterSpacing:".16em",padding:"7px 24px",borderRadius:30,boxShadow:"0 4px 20px rgba(184,150,46,0.6),inset 0 1px 0 rgba(255,255,255,0.35)",textAlign:"center",whiteSpace:"nowrap"}}>⚽ PRONOS · COUPE DU MONDE 2026 ⚽</div>
+              {/* Drapeau statique, bien proportionné */}
+              <div style={{position:"relative",width:160,height:107,borderRadius:6,overflow:"hidden",boxShadow:"0 8px 32px rgba(0,0,0,0.7),0 2px 8px rgba(0,0,0,0.5),0 0 0 2px rgba(255,215,0,0.3)"}}>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} alt="🇲🇦"/>
+                <div style={{position:"absolute",inset:0,background:"linear-gradient(135deg,rgba(255,255,255,0.12) 0%,transparent 50%,rgba(0,0,0,0.15) 100%)",pointerEvents:"none"}}/>
               </div>
             </div>
           </div>
