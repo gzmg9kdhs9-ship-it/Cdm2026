@@ -115,6 +115,7 @@ function isLocked(iso){return Date.now()>=new Date(iso).getTime();}
 function fmtDay(iso){return new Date(iso).toLocaleDateString("fr-FR",{timeZone:TZ,weekday:"long",day:"numeric",month:"long",year:"numeric"});}
 function fmtHour(iso){return new Date(iso).toLocaleTimeString("fr-FR",{timeZone:TZ,hour:"2-digit",minute:"2-digit"});}
 function dayKey(iso){const d=new Date(new Date(iso).toLocaleString("en-US",{timeZone:TZ}));return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
+function todayKey(){const d=new Date(new Date().toLocaleString("en-US",{timeZone:TZ}));return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
 
 function scoreProno(p,r){
   if(!p||!r)return null;
@@ -124,7 +125,7 @@ function scoreProno(p,r){
   const pw=ph>pa?"H":ph<pa?"A":"D",rw=rh>ra?"H":rh<ra?"A":"D",ok=pw===rw;
   if(ok&&(ph===rh||pa===ra))return 3;
   if(ok)return 2;
-  if(Math.abs(ph-pa)===Math.abs(rh-ra)&&Math.abs(rh-ra)>0)return 1;
+  if(ph===rh||pa===ra)return 1;
   return 0;
 }
 
@@ -142,7 +143,6 @@ function computeStandings(players,pronos,results){
   }).sort((a,b)=>b.total-a.total||b.exact-a.exact||b.winners-a.winners);
 }
 
-// ── BASE DE DONNÉES PARTAGÉE (Supabase via API route) ─────────────────────────
 async function dbSave(key, value) {
   try {
     await fetch("/api/db", {
@@ -151,7 +151,6 @@ async function dbSave(key, value) {
       body: JSON.stringify({key, value}),
     });
   } catch(e) {
-    // Fallback localStorage
     try { localStorage.setItem("cdm2026_"+key, JSON.stringify(value)); } catch{}
   }
 }
@@ -162,30 +161,28 @@ async function dbLoad(key) {
     const data = await res.json();
     if (data.value !== null && data.value !== undefined) return data.value;
   } catch{}
-  // Fallback localStorage
   try {
     const v = localStorage.getItem("cdm2026_"+key);
     return v ? JSON.parse(v) : null;
   } catch { return null; }
 }
 
-// ── STYLES ────────────────────────────────────────────────────────────────────
 const S = {
-  app:{minHeight:"100vh",background:"#0f172a",color:"#f1f5f9",fontFamily:"'Inter','Segoe UI',sans-serif",paddingBottom:60},
-  header:{background:"linear-gradient(135deg,#1e3a5f,#0f172a)",borderBottom:"2px solid #16a34a",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,position:"sticky",top:0,zIndex:100},
+  app:{minHeight:"100vh",background:"#005c26",color:"#f1f5f9",fontFamily:"'Inter','Segoe UI',sans-serif",paddingBottom:60},
+  header:{background:"linear-gradient(135deg,#8B0000,#C1272D 40%,#006233 100%)",borderBottom:"3px solid #B8962E",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,position:"sticky",top:0,zIndex:100},
   page:{maxWidth:720,margin:"0 auto",padding:"20px 16px"},
   center:{maxWidth:480,margin:"0 auto",padding:"20px 16px"},
-  card:{background:"#1e293b",border:"1px solid #334155",borderRadius:12,padding:20,marginBottom:16},
-  btn:{background:"linear-gradient(135deg,#16a34a,#15803d)",color:"#fff",border:"none",padding:"12px 24px",borderRadius:8,fontSize:15,fontWeight:700,cursor:"pointer",width:"100%",display:"block",marginTop:12},
-  input:{background:"#0f172a",border:"1px solid #334155",color:"#f1f5f9",padding:"10px 14px",borderRadius:8,fontSize:15,outline:"none",width:"100%",boxSizing:"border-box"},
-  scoreInput:{background:"#0f172a",border:"1px solid #475569",color:"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"},
-  navBtn:{background:"transparent",border:"1px solid #334155",color:"#94a3b8",padding:"5px 10px",borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600},
-  navBtnOn:{background:"#16a34a",border:"1px solid #16a34a",color:"#fff"},
-  dayHeader:{fontSize:13,fontWeight:700,color:"#93c5fd",background:"#0f1f3d",border:"1px solid #1e3a5f",borderRadius:8,padding:"8px 12px",marginBottom:8,marginTop:16,textTransform:"capitalize"},
-  matchCard:{background:"#1e293b",border:"1px solid #334155",borderRadius:10,padding:"12px 14px",marginBottom:8},
-  phaseBtn:{background:"#1e293b",border:"1px solid #334155",color:"#64748b",padding:"6px 10px",borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600},
-  phaseBtnOn:{background:"#1e3a5f",border:"1px solid #3b82f6",color:"#93c5fd"},
-  chip:{fontSize:12,color:"#64748b",background:"#0f172a",padding:"2px 8px",borderRadius:12},
+  card:{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20,marginBottom:16},
+  btn:{background:"linear-gradient(135deg,#C1272D,#8B0000)",color:"#fff",border:"none",padding:"12px 24px",borderRadius:8,fontSize:15,fontWeight:700,cursor:"pointer",width:"100%",display:"block",marginTop:12},
+  input:{background:"#005c26",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"10px 14px",borderRadius:8,fontSize:15,outline:"none",width:"100%",boxSizing:"border-box"},
+  scoreInput:{background:"#004d1a",border:"1px solid #B8962E44",color:"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"},
+  navBtn:{background:"transparent",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"5px 10px",borderRadius:6,cursor:"pointer",fontSize:13,fontWeight:600},
+  navBtnOn:{background:"#C1272D",border:"1px solid #C1272D",color:"#fff"},
+  dayHeader:{fontSize:13,fontWeight:700,color:"#FFD700",background:"#004d1a",border:"1px solid #B8962E44",borderRadius:8,padding:"8px 12px",marginBottom:8,marginTop:16,textTransform:"capitalize"},
+  matchCard:{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:10,padding:"12px 14px",marginBottom:8},
+  phaseBtn:{background:"#006233",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"6px 10px",borderRadius:6,cursor:"pointer",fontSize:12,fontWeight:600},
+  phaseBtnOn:{background:"#C1272D",border:"1px solid #C1272D",color:"#fff"},
+  chip:{fontSize:12,color:"#f1f5f9",background:"#004d1a",padding:"2px 8px",borderRadius:12},
   bonus:{fontSize:11,background:"#92400e",color:"#fcd34d",padding:"2px 8px",borderRadius:12,fontWeight:700},
   spinner:{width:14,height:14,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",display:"inline-block",animation:"spin .8s linear infinite"},
   toast:{position:"fixed",bottom:20,left:"50%",transform:"translateX(-50%)",color:"#fff",padding:"10px 20px",borderRadius:8,fontWeight:700,fontSize:14,zIndex:9999,boxShadow:"0 4px 20px rgba(0,0,0,.5)",whiteSpace:"nowrap"},
@@ -219,7 +216,6 @@ export default function App() {
     load();
   },[]);
 
-  // Sync toutes les 15s entre tous les téléphones
   useEffect(()=>{
     const t=setInterval(async()=>{
       const[p,pr,r]=await Promise.all([dbLoad("players"),dbLoad("pronos"),dbLoad("results")]);
@@ -271,25 +267,37 @@ export default function App() {
   if(loading)return(
     <div style={{...S.app,display:"flex",alignItems:"center",justifyContent:"center",flexDirection:"column",gap:16,minHeight:"100vh"}}>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-      <div style={{fontSize:48}}>⚽</div>
-      <div style={{color:"#94a3b8"}}>Chargement…</div>
-      <div style={{width:24,height:24,border:"3px solid rgba(255,255,255,.2)",borderTop:"3px solid #16a34a",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
+      <div style={{fontSize:48}}>🇲🇦</div>
+      <div style={{color:"#FFD700",fontWeight:700}}>Chargement…</div>
+      <div style={{width:24,height:24,border:"3px solid rgba(255,255,255,.2)",borderTop:"3px solid #FFD700",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>
     </div>
   );
 
   return(
     <div style={S.app}>
-      <style>{`@keyframes spin{to{transform:rotate(360deg)}} *{box-sizing:border-box} input[type=number]::-webkit-inner-spin-button{opacity:1}`}</style>
+      <style>{`
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes floatflag{
+          0%,100%{transform:translateY(-50%) rotate(3deg) scale(1);filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5)) brightness(1);}
+          25%{transform:translateY(-53%) rotate(1deg) scale(1.03);filter:drop-shadow(0 14px 35px rgba(0,0,0,0.4)) brightness(1.1);}
+          50%{transform:translateY(-48%) rotate(4deg) scale(0.98);filter:drop-shadow(0 8px 25px rgba(0,0,0,0.6)) brightness(1.05);}
+          75%{transform:translateY(-52%) rotate(2deg) scale(1.02);filter:drop-shadow(0 12px 32px rgba(0,0,0,0.45)) brightness(1.12);}
+        }
+        @keyframes maskglow{0%,100%{opacity:0.7;}50%{opacity:1;}}
+        @keyframes textglow{0%,100%{text-shadow:0 0 6px rgba(255,215,0,0.4);}50%{text-shadow:0 0 20px rgba(255,215,0,1),0 0 40px rgba(255,215,0,0.4);}}
+        *{box-sizing:border-box}
+        input[type=number]::-webkit-inner-spin-button{opacity:1}
+      `}</style>
       {toast&&<div style={{...S.toast,background:toast.color}}>{toast.msg}</div>}
 
       <header style={S.header}>
         <button style={{background:"none",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:8,padding:0}} onClick={()=>setScreen("home")}>
           <span style={{fontSize:22}}>⚽</span>
-          <span style={{fontSize:18,fontWeight:900,color:"#f1f5f9",letterSpacing:".05em"}}>PRONOS <span style={{color:"#16a34a"}}>CDM</span> 2026</span>
+          <span style={{fontSize:18,fontWeight:900,color:"#fff",letterSpacing:".05em",fontFamily:"Impact,sans-serif"}}>PRONOS <span style={{color:"#ff4444"}}>CDM</span> <span style={{color:"#FFD700"}}>2026</span></span>
         </button>
         {screen!=="home"&&screen!=="adminSetup"&&(
           <nav style={{display:"flex",gap:4,flexWrap:"wrap",alignItems:"center"}}>
-            {activePlayer&&<span style={{background:"#1e3a5f",border:"1px solid #3b82f6",color:"#93c5fd",padding:"4px 10px",borderRadius:20,fontSize:12,fontWeight:600}}>👤 {activePlayer}</span>}
+            {activePlayer&&<span style={{background:"rgba(0,0,0,0.3)",border:"1px solid #FFD700",color:"#FFD700",padding:"4px 10px",borderRadius:20,fontSize:12,fontWeight:600}}>👤 {activePlayer}</span>}
             {[["prono","📝"],["results","📊"],["standings","🏆"]].map(([s,l])=>(
               <button key={s} style={{...S.navBtn,...(screen===s?S.navBtnOn:{})}} onClick={()=>setScreen(s)}>{l}</button>
             ))}
@@ -299,37 +307,57 @@ export default function App() {
 
       {screen==="home"&&(
         <div style={S.center}>
-          <div style={{background:"linear-gradient(135deg,#1e3a5f,#0f172a)",border:"2px solid #16a34a",borderRadius:16,padding:"32px 24px",marginBottom:20,textAlign:"center"}}>
-            <div style={{fontSize:46,fontWeight:900,marginBottom:6}}>⚽ CDM 2026</div>
-            <div style={{fontSize:13,color:"#94a3b8",letterSpacing:".12em",textTransform:"uppercase"}}>Groupe des 5 · Pronos</div>
+          {/* HERO avec drapeau flottant + masque DIMA MAGHRIB */}
+          <div style={{position:"relative",overflow:"hidden",minHeight:220,background:"linear-gradient(135deg,#7a0000 0%,#C1272D 35%,#8B0000 55%,#006233 80%,#004d1a 100%)",borderRadius:16,marginBottom:20}}>
+            {/* Drapeau flottant vers la droite */}
+            <div style={{position:"absolute",top:"50%",left:-10,fontSize:120,lineHeight:1,animation:"floatflag 4s ease-in-out infinite",zIndex:1}}>🇲🇦</div>
+            {/* DIMA MAGHRIB en masque */}
+            <div style={{position:"absolute",top:0,left:0,right:0,bottom:0,display:"flex",alignItems:"center",justifyContent:"center",zIndex:1,pointerEvents:"none",transform:"rotate(-15deg)",animation:"maskglow 4s ease-in-out infinite"}}>
+              <div style={{textAlign:"center"}}>
+                <div style={{fontFamily:"Impact,sans-serif",fontSize:60,fontWeight:900,letterSpacing:".08em",lineHeight:0.9,background:"linear-gradient(135deg,rgba(255,215,0,0.18),rgba(255,255,255,0.22),rgba(255,215,0,0.1))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",whiteSpace:"nowrap"}}>DIMA MAGHRIB</div>
+                <div style={{fontSize:40,background:"linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,215,0,0.15))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",lineHeight:1}}>ديما المغرب</div>
+              </div>
+            </div>
+            {/* Contenu hero */}
+            <div style={{position:"relative",zIndex:2,padding:"22px 22px 18px",textAlign:"right"}}>
+              <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"#B8962E",color:"#000",fontSize:10,fontWeight:800,letterSpacing:".15em",padding:"4px 12px",borderRadius:20,textTransform:"uppercase",marginBottom:12}}>🏆 Pronostics · Édition 2026</div>
+              <div style={{fontFamily:"Impact,sans-serif",fontSize:50,color:"#fff",lineHeight:.9,letterSpacing:".02em",textShadow:"3px 3px 0px rgba(0,0,0,0.5)"}}>COUPE<br/>DU <span style={{color:"#4ade80"}}>MONDE</span><br/><span style={{color:"#FFD700"}}>2026</span></div>
+              <div style={{fontFamily:"Impact,sans-serif",fontSize:15,color:"#FFD700",letterSpacing:".25em",marginTop:12,animation:"textglow 3s ease-in-out infinite"}}>✦ DIMA MAGHRIB ✦</div>
+              <div style={{fontSize:18,color:"rgba(255,255,255,0.85)",marginTop:3}}>ديما المغرب</div>
+            </div>
           </div>
+          {/* Divider tricolore */}
+          <div style={{height:5,background:"linear-gradient(90deg,#C1272D 0%,#B8962E 50%,#006233 100%)",borderRadius:3,marginBottom:20,position:"relative"}}>
+            <span style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",color:"#FFD700",fontSize:14,background:"#005c26",padding:"0 6px",lineHeight:1}}>★</span>
+          </div>
+
           {!adminSetup?(
             <div style={S.card}>
               <h2 style={{fontSize:18,fontWeight:800,marginBottom:8}}>Bienvenue !</h2>
-              <p style={{color:"#94a3b8",fontSize:14,marginBottom:16}}>L'admin doit configurer les profils.</p>
+              <p style={{color:"#d1fae5",fontSize:14,marginBottom:16}}>L'admin doit configurer les profils.</p>
               <button style={S.btn} onClick={()=>{setAdminMode(false);setAdminPass("");setShowAdminInput(false);setScreen("adminSetup")}}>⚙️ Configurer (Admin)</button>
             </div>
           ):(
             <>
               <div style={S.card}>
-                <h2 style={{fontSize:18,fontWeight:800,marginBottom:8}}>👤 Qui êtes-vous ?</h2>
-                <p style={{color:"#94a3b8",fontSize:14,marginBottom:16}}>Appuyez sur votre prénom.</p>
+                <h2 style={{fontSize:18,fontWeight:800,marginBottom:8,color:"#FFD700"}}>👤 Qui êtes-vous ?</h2>
+                <p style={{color:"#d1fae5",fontSize:14,marginBottom:16}}>Appuyez sur votre prénom.</p>
                 <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(100px,1fr))",gap:10}}>
                   {players.map(p=>{
                     const done=Object.keys(pronos[p]||{}).filter(k=>k!=="champion").length;
                     return(
-                      <button key={p} style={{background:"#0f172a",border:"1px solid #334155",borderRadius:12,padding:"12px 8px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8}} onClick={()=>{setActivePlayer(p);setScreen("prono")}}>
-                        <div style={{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg,#16a34a,#15803d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:800,color:"#fff"}}>{p[0].toUpperCase()}</div>
-                        <div style={{fontSize:14,fontWeight:700}}>{p}</div>
-                        <div style={{fontSize:10,color:"#64748b"}}>{done} pronos</div>
+                      <button key={p} style={{background:"#006233",border:"2px solid #B8962E44",borderRadius:12,padding:"12px 8px",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:8}} onClick={()=>{setActivePlayer(p);setScreen("prono")}}>
+                        <div style={{width:44,height:44,borderRadius:"50%",background:"linear-gradient(135deg,#C1272D,#8B0000)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,fontWeight:800,color:"#fff",border:"2px solid #FFD700"}}>{p[0].toUpperCase()}</div>
+                        <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>{p}</div>
+                        <div style={{fontSize:10,color:"#FFD700"}}>{done} pronos</div>
                       </button>
                     );
                   })}
                 </div>
               </div>
               <div style={{display:"flex",gap:8}}>
-                <button style={{...S.btn,flex:1,marginTop:0,background:"linear-gradient(135deg,#7c3aed,#6d28d9)"}} onClick={()=>setScreen("standings")}>🏆 Classement</button>
-                <button style={{...S.btn,flex:1,marginTop:0,background:"linear-gradient(135deg,#374151,#1f2937)"}} onClick={()=>{setAdminMode(false);setAdminPass("");setShowAdminInput(false);setScreen("adminSetup")}}>⚙️ Admin</button>
+                <button style={{...S.btn,flex:1,marginTop:0,background:"linear-gradient(135deg,#B8962E,#8B6914)",color:"#000"}} onClick={()=>setScreen("standings")}>🏆 Classement</button>
+                <button style={{...S.btn,flex:1,marginTop:0,background:"linear-gradient(135deg,#004d1a,#003d14)"}} onClick={()=>{setAdminMode(false);setAdminPass("");setShowAdminInput(false);setScreen("adminSetup")}}>⚙️ Admin</button>
               </div>
             </>
           )}
@@ -350,7 +378,7 @@ export default function App() {
             <div style={{maxWidth:400,margin:"0 auto"}}>
               <div style={S.card}>
                 <h2 style={{fontSize:18,fontWeight:800,marginBottom:8}}>🔐 Mode Admin</h2>
-                <p style={{color:"#94a3b8",fontSize:14,marginBottom:16}}>Mot de passe requis.</p>
+                <p style={{color:"#d1fae5",fontSize:14,marginBottom:16}}>Mot de passe requis.</p>
                 {showAdminInput?(
                   <>
                     <input style={{...S.input,marginBottom:8}} type="password" placeholder="Mot de passe" value={adminPass} onChange={e=>setAdminPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(adminPass===ADMIN_PASS?setAdminMode(true):showToast("Incorrect","#dc2626"))}/>
@@ -367,25 +395,25 @@ export default function App() {
 
       {screen==="standings"&&(
         <div style={S.page}>
-          <h2 style={{fontSize:20,fontWeight:800,textAlign:"center",marginBottom:20}}>🏆 Classement</h2>
+          <h2 style={{fontSize:20,fontWeight:800,textAlign:"center",marginBottom:20,color:"#FFD700"}}>🏆 Classement</h2>
           <div style={{...S.card,marginBottom:16}}>
-            <p style={{fontWeight:700,fontSize:14,marginBottom:10,color:"#94a3b8"}}>🎯 Champions prédits</p>
+            <p style={{fontWeight:700,fontSize:14,marginBottom:10,color:"#FFD700"}}>🎯 Champions prédits</p>
             <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
               {players.map(p=>(
-                <div key={p} style={{background:"#0f172a",border:"1px solid #334155",borderRadius:8,padding:"6px 12px"}}>
-                  <div style={{fontSize:11,color:"#64748b"}}>{p}</div>
-                  <div style={{fontSize:14,fontWeight:700}}>{pronos[p]?.champion||"—"}</div>
+                <div key={p} style={{background:"#006233",border:"1px solid #B8962E44",borderRadius:8,padding:"6px 12px"}}>
+                  <div style={{fontSize:11,color:"#d1fae5"}}>{p}</div>
+                  <div style={{fontSize:14,fontWeight:700,color:"#fff"}}>{pronos[p]?.champion||"—"}</div>
                 </div>
               ))}
             </div>
-            {results.champion&&<div style={{marginTop:10,color:"#fbbf24",fontSize:14}}>🏅 Champion réel : <strong>{results.champion}</strong></div>}
+            {results.champion&&<div style={{marginTop:10,color:"#FFD700",fontSize:14}}>🏅 Champion réel : <strong>{results.champion}</strong></div>}
           </div>
           {standings.map((s,i)=>(
-            <div key={s.name} style={{...S.card,display:"flex",alignItems:"center",gap:12,marginBottom:8,border:i===0?"2px solid #fbbf24":i===standings.length-1?"1px solid #dc2626":"1px solid #334155"}}>
+            <div key={s.name} style={{...S.card,display:"flex",alignItems:"center",gap:12,marginBottom:8,border:i===0?"2px solid #FFD700":i===standings.length-1?"1px solid #dc2626":"1px solid #B8962E44"}}>
               <span style={{fontSize:22,minWidth:36}}>{["🥇","🥈","🥉"][i]||`#${i+1}`}</span>
-              <span style={{fontSize:17,fontWeight:800,flex:1}}>{s.name}</span>
+              <span style={{fontSize:17,fontWeight:800,flex:1,color:"#fff"}}>{s.name}</span>
               <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center"}}>
-                <span style={{fontSize:20,fontWeight:900,color:"#16a34a"}}>{s.total} pts</span>
+                <span style={{fontSize:20,fontWeight:900,color:"#FFD700"}}>{s.total} pts</span>
                 <span style={S.chip}>✅ {s.exact}</span>
                 <span style={S.chip}>🎯 {s.winners}</span>
                 {s.cb>0&&<span style={S.bonus}>+{s.cb} Carré</span>}
@@ -404,33 +432,31 @@ function AdminSetup({adminMode,adminPass,setAdminPass,showAdminInput,setShowAdmi
   const[local,setLocal]=useState(players.length?players:["","","","",""]);
   if(!adminMode)return(
     <div style={{maxWidth:400,margin:"0 auto",padding:"20px 16px"}}>
-      <div style={{background:"#1e293b",border:"1px solid #334155",borderRadius:12,padding:20}}>
-        <h2 style={{fontSize:18,fontWeight:800,marginBottom:8}}>⚙️ Configuration Admin</h2>
-        <p style={{color:"#94a3b8",fontSize:14,marginBottom:16}}>Entrez le mot de passe.</p>
+      <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20}}>
+        <h2 style={{fontSize:18,fontWeight:800,marginBottom:8,color:"#FFD700"}}>⚙️ Configuration Admin</h2>
+        <p style={{color:"#d1fae5",fontSize:14,marginBottom:16}}>Entrez le mot de passe.</p>
         {showAdminInput?(
           <>
-            <input style={{background:"#0f172a",border:"1px solid #334155",color:"#f1f5f9",padding:"10px 14px",borderRadius:8,fontSize:15,outline:"none",width:"100%",marginBottom:8}} type="password" placeholder="Mot de passe" value={adminPass} onChange={e=>setAdminPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(adminPass===ADMIN_PASS?onAuth():showToast("Incorrect","#dc2626"))}/>
-            <button style={{background:"linear-gradient(135deg,#16a34a,#15803d)",color:"#fff",border:"none",padding:"11px",borderRadius:8,fontSize:15,fontWeight:700,cursor:"pointer",width:"100%",marginBottom:8}} onClick={()=>adminPass===ADMIN_PASS?onAuth():showToast("Incorrect","#dc2626")}>Entrer</button>
-            <p style={{color:"#4b5563",fontSize:12}}>Mot de passe : cdm2026</p>
+            <input style={{background:"#005c26",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"10px 14px",borderRadius:8,fontSize:15,outline:"none",width:"100%",marginBottom:8}} type="password" placeholder="Mot de passe" value={adminPass} onChange={e=>setAdminPass(e.target.value)} onKeyDown={e=>e.key==="Enter"&&(adminPass===ADMIN_PASS?onAuth():showToast("Incorrect","#dc2626"))}/>
+            <button style={{background:"linear-gradient(135deg,#C1272D,#8B0000)",color:"#fff",border:"none",padding:"11px",borderRadius:8,fontSize:15,fontWeight:700,cursor:"pointer",width:"100%",marginBottom:8}} onClick={()=>adminPass===ADMIN_PASS?onAuth():showToast("Incorrect","#dc2626")}>Entrer</button>
           </>
-        ):<button style={{background:"linear-gradient(135deg,#16a34a,#15803d)",color:"#fff",border:"none",padding:"11px",borderRadius:8,fontSize:15,fontWeight:700,cursor:"pointer",width:"100%"}} onClick={()=>setShowAdminInput(true)}>Accéder</button>}
+        ):<button style={{background:"linear-gradient(135deg,#C1272D,#8B0000)",color:"#fff",border:"none",padding:"11px",borderRadius:8,fontSize:15,fontWeight:700,cursor:"pointer",width:"100%"}} onClick={()=>setShowAdminInput(true)}>Accéder</button>}
       </div>
     </div>
   );
   return(
     <div style={{maxWidth:500,margin:"0 auto",padding:"20px 16px"}}>
-      <h2 style={{fontSize:18,fontWeight:800,marginBottom:16}}>⚙️ Gestion des joueurs</h2>
-      <div style={{background:"#1e293b",border:"1px solid #334155",borderRadius:12,padding:20}}>
-        <p style={{color:"#94a3b8",fontSize:14,marginBottom:16}}>Données <strong style={{color:"#4ade80"}}>partagées</strong> entre tous les appareils ✅</p>
+      <h2 style={{fontSize:18,fontWeight:800,marginBottom:16,color:"#FFD700"}}>⚙️ Gestion des joueurs</h2>
+      <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20}}>
         {local.map((p,i)=>(
           <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-            <div style={{width:34,height:34,borderRadius:"50%",background:"linear-gradient(135deg,#16a34a,#15803d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:800,color:"#fff",flexShrink:0}}>{p?p[0].toUpperCase():i+1}</div>
-            <input style={{background:"#0f172a",border:"1px solid #334155",color:"#f1f5f9",padding:"10px 14px",borderRadius:8,fontSize:15,outline:"none",flex:1}} placeholder={`Joueur ${i+1}`} value={p} onChange={e=>{const n=[...local];n[i]=e.target.value;setLocal(n);}}/>
-            {local.length>2&&<button style={{background:"#1f2937",border:"1px solid #374151",color:"#9ca3af",width:32,height:32,borderRadius:6,cursor:"pointer",fontSize:14,flexShrink:0}} onClick={()=>setLocal(local.filter((_,j)=>j!==i))}>✕</button>}
+            <div style={{width:34,height:34,borderRadius:"50%",background:"linear-gradient(135deg,#C1272D,#8B0000)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,fontWeight:800,color:"#fff",flexShrink:0,border:"1px solid #FFD700"}}>{p?p[0].toUpperCase():i+1}</div>
+            <input style={{background:"#005c26",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"10px 14px",borderRadius:8,fontSize:15,outline:"none",flex:1}} placeholder={`Joueur ${i+1}`} value={p} onChange={e=>{const n=[...local];n[i]=e.target.value;setLocal(n);}}/>
+            {local.length>2&&<button style={{background:"#004d1a",border:"1px solid #B8962E44",color:"#f1f5f9",width:32,height:32,borderRadius:6,cursor:"pointer",fontSize:14,flexShrink:0}} onClick={()=>setLocal(local.filter((_,j)=>j!==i))}>✕</button>}
           </div>
         ))}
-        {local.length<8&&<button style={{background:"#1e293b",border:"1px dashed #475569",color:"#94a3b8",padding:"10px",borderRadius:8,fontSize:14,cursor:"pointer",width:"100%",marginBottom:8}} onClick={()=>setLocal([...local,""])}>+ Ajouter</button>}
-        <button style={{background:"linear-gradient(135deg,#16a34a,#15803d)",color:"#fff",border:"none",padding:"12px",borderRadius:8,fontSize:15,fontWeight:700,cursor:"pointer",width:"100%",marginTop:8}} onClick={()=>{const v=local.filter(p=>p.trim());if(v.length<2)return showToast("Minimum 2 joueurs !","#dc2626");onSave(v);}}>💾 Sauvegarder</button>
+        {local.length<12&&<button style={{background:"#005c26",border:"1px dashed #B8962E",color:"#FFD700",padding:"10px",borderRadius:8,fontSize:14,cursor:"pointer",width:"100%",marginBottom:8}} onClick={()=>setLocal([...local,""])}>+ Ajouter</button>}
+        <button style={{background:"linear-gradient(135deg,#C1272D,#8B0000)",color:"#fff",border:"none",padding:"12px",borderRadius:8,fontSize:15,fontWeight:700,cursor:"pointer",width:"100%",marginTop:8}} onClick={()=>{const v=local.filter(p=>p.trim());if(v.length<2)return showToast("Minimum 2 joueurs !","#dc2626");onSave(v);}}>💾 Sauvegarder</button>
       </div>
     </div>
   );
@@ -443,28 +469,58 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
   const set=(id,side,val)=>setLocal(l=>({...l,[id]:{...l[id],[side]:val}}));
   const locked=SORTED.filter(m=>isLocked(m.kickoff)).length;
   const open=SORTED.length-locked;
+
+  // Matchs du jour
+  const tk=todayKey();
+  const todayMatches=SORTED.filter(m=>dayKey(m.kickoff)===tk&&!isLocked(m.kickoff));
+
   return(
     <div>
-      <div style={{...S.card,display:"flex",alignItems:"center",gap:14,marginBottom:14}}>
-        <div style={{width:48,height:48,borderRadius:"50%",background:"linear-gradient(135deg,#16a34a,#15803d)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:"#fff"}}>{player[0].toUpperCase()}</div>
+      <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20,display:"flex",alignItems:"center",gap:14,marginBottom:14}}>
+        <div style={{width:48,height:48,borderRadius:"50%",background:"linear-gradient(135deg,#C1272D,#8B0000)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,fontWeight:800,color:"#fff",border:"2px solid #FFD700"}}>{player[0].toUpperCase()}</div>
         <div>
-          <div style={{fontWeight:800,fontSize:18}}>{player}</div>
-          <div style={{fontSize:12,color:"#94a3b8",marginTop:3}}>
+          <div style={{fontWeight:800,fontSize:18,color:"#fff"}}>{player}</div>
+          <div style={{fontSize:12,color:"#d1fae5",marginTop:3}}>
             <span style={{color:"#4ade80"}}>🟢 {open} ouvert(s)</span>
             {locked>0&&<span style={{color:"#f87171",marginLeft:10}}>🔒 {locked} verrouillé(s)</span>}
           </div>
         </div>
       </div>
+
+      {/* SECTION MATCHS DU JOUR */}
+      {todayMatches.length>0&&(
+        <div style={{background:"linear-gradient(135deg,#7a0000,#C1272D)",border:"2px solid #FFD700",borderRadius:14,padding:16,marginBottom:16}}>
+          <div style={{fontFamily:"Impact,sans-serif",fontSize:18,color:"#FFD700",letterSpacing:".1em",marginBottom:12}}>⚡ MATCHS DU JOUR — À PRONO !</div>
+          {todayMatches.map(m=>(
+            <div key={m.id} style={{background:"rgba(0,0,0,0.3)",borderRadius:10,padding:"12px 14px",marginBottom:8}}>
+              <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
+                <span style={{fontSize:11,color:"#FFD700",textTransform:"uppercase",fontWeight:700}}>{m.group||m.phase}</span>
+                <span style={{fontSize:11,color:"#fbbf24",fontWeight:600}}>⏰ {fmtHour(m.kickoff)}</span>
+              </div>
+              <div style={{display:"flex",alignItems:"center",gap:8}}>
+                <span style={{flex:1,fontSize:13,fontWeight:700,color:"#fff",textAlign:"center"}}>{m.home}</span>
+                <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #FFD700",color:"#fff",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="0" value={local[m.id]?.home??""} onChange={e=>set(m.id,"home",e.target.value)}/>
+                <span style={{color:"#FFD700",fontWeight:900,fontSize:20}}>–</span>
+                <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #FFD700",color:"#fff",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="0" value={local[m.id]?.away??""} onChange={e=>set(m.id,"away",e.target.value)}/>
+                <span style={{flex:1,fontSize:13,fontWeight:700,color:"#fff",textAlign:"center"}}>{m.away}</span>
+              </div>
+            </div>
+          ))}
+          <button style={{background:"linear-gradient(135deg,#B8962E,#8B6914)",color:"#000",border:"none",padding:"13px",borderRadius:10,fontSize:15,fontWeight:800,cursor:"pointer",width:"100%",marginTop:4}} onClick={()=>onSave(local)}>⚡ Valider mes pronos du jour !</button>
+        </div>
+      )}
+
       <div style={{display:"flex",gap:6,marginBottom:16}}>
         {[["my","📝 Mes pronos"],["all","👥 Tout le monde"]].map(([v,l])=>(
-          <button key={v} style={{background:view===v?"#1e3a5f":"#1e293b",border:`1px solid ${view===v?"#3b82f6":"#334155"}`,color:view===v?"#93c5fd":"#64748b",padding:"8px 16px",borderRadius:8,cursor:"pointer",fontSize:14,fontWeight:600}} onClick={()=>setView(v)}>{l}</button>
+          <button key={v} style={{background:view===v?"#C1272D":"#006233",border:`1px solid ${view===v?"#C1272D":"#B8962E44"}`,color:"#fff",padding:"8px 16px",borderRadius:8,cursor:"pointer",fontSize:14,fontWeight:600}} onClick={()=>setView(v)}>{l}</button>
         ))}
       </div>
+
       {view==="my"&&(
         <>
-          <div style={{...S.card,marginBottom:14}}>
-            <label style={{fontSize:13,color:"#94a3b8",display:"block",marginBottom:8}}>🏆 Champion prédit (+10 pts)</label>
-            <input style={{background:"#0f172a",border:"1px solid #334155",color:"#f1f5f9",padding:"8px 12px",borderRadius:8,fontSize:15,outline:"none",width:"100%"}} placeholder="Équipe championne" value={local.champion||""} onChange={e=>setLocal(l=>({...l,champion:e.target.value}))}/>
+          <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20,marginBottom:14}}>
+            <label style={{fontSize:13,color:"#FFD700",display:"block",marginBottom:8}}>🏆 Champion prédit (+10 pts)</label>
+            <input style={{background:"#005c26",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"8px 12px",borderRadius:8,fontSize:15,outline:"none",width:"100%"}} placeholder="Équipe championne" value={local.champion||""} onChange={e=>setLocal(l=>({...l,champion:e.target.value}))}/>
           </div>
           {(()=>{
             let lastDay=null;
@@ -475,17 +531,17 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
               return(
                 <div key={m.id}>
                   {nd&&<div style={S.dayHeader}>📅 {fmtDay(m.kickoff)}</div>}
-                  <div style={{background:lk?"#1a0808":"#1e293b",border:`1px solid ${lk?"#7f1d1d":"#334155"}`,borderRadius:10,padding:"12px 14px",marginBottom:8,opacity:lk?.85:1}}>
+                  <div style={{background:lk?"#1a0808":"#007a3d",border:`1px solid ${lk?"#7f1d1d":"#B8962E44"}`,borderRadius:10,padding:"12px 14px",marginBottom:8,opacity:lk?.85:1}}>
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
-                      <span style={{fontSize:11,color:"#64748b",textTransform:"uppercase"}}>{m.group||m.phase}</span>
+                      <span style={{fontSize:11,color:"#FFD700",textTransform:"uppercase"}}>{m.group||m.phase}</span>
                       <span style={{fontSize:11,fontWeight:600}}>{lk?<span style={{color:"#f87171"}}>🔒 {fmtHour(m.kickoff)}</span>:<span style={{color:"#fbbf24"}}>⏰ {fmtHour(m.kickoff)}</span>}</span>
                     </div>
                     <div style={{display:"flex",alignItems:"center",gap:8}}>
-                      <span style={{flex:1,fontSize:13,fontWeight:600,color:"#e2e8f0",textAlign:"center"}}>{m.home}</span>
-                      <input style={{background:lk?"#1a0808":"#0f172a",border:`1px solid ${lk?"#7f1d1d":"#475569"}`,color:lk?"#4b5563":"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"}} type="number" min="0" max="20" placeholder="0" disabled={lk} value={local[m.id]?.home??""} onChange={e=>!lk&&set(m.id,"home",e.target.value)}/>
-                      <span style={{color:"#475569",fontWeight:700,fontSize:18}}>–</span>
-                      <input style={{background:lk?"#1a0808":"#0f172a",border:`1px solid ${lk?"#7f1d1d":"#475569"}`,color:lk?"#4b5563":"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"}} type="number" min="0" max="20" placeholder="0" disabled={lk} value={local[m.id]?.away??""} onChange={e=>!lk&&set(m.id,"away",e.target.value)}/>
-                      <span style={{flex:1,fontSize:13,fontWeight:600,color:"#e2e8f0",textAlign:"center"}}>{m.away}</span>
+                      <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.home}</span>
+                      <input style={{background:lk?"#1a0808":"#004d1a",border:`1px solid ${lk?"#7f1d1d":"#B8962E44"}`,color:lk?"#4b5563":"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"}} type="number" min="0" max="20" placeholder="0" disabled={lk} value={local[m.id]?.home??""} onChange={e=>!lk&&set(m.id,"home",e.target.value)}/>
+                      <span style={{color:"#B8962E",fontWeight:700,fontSize:18}}>–</span>
+                      <input style={{background:lk?"#1a0808":"#004d1a",border:`1px solid ${lk?"#7f1d1d":"#B8962E44"}`,color:lk?"#4b5563":"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"}} type="number" min="0" max="20" placeholder="0" disabled={lk} value={local[m.id]?.away??""} onChange={e=>!lk&&set(m.id,"away",e.target.value)}/>
+                      <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.away}</span>
                     </div>
                     {lk&&results[m.id]&&<div style={{textAlign:"center",fontSize:12,color:"#4ade80",marginTop:6}}>Résultat : {results[m.id].home}–{results[m.id].away}</div>}
                   </div>
@@ -498,7 +554,7 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
       )}
       {view==="all"&&(
         <div>
-          <div style={{background:"#0f1a0f",border:"1px solid #166534",borderRadius:12,padding:14,marginBottom:14}}>
+          <div style={{background:"#004d1a",border:"1px solid #B8962E44",borderRadius:12,padding:14,marginBottom:14}}>
             <p style={{margin:0,fontSize:13,color:"#4ade80"}}>👥 Pronos visibles après le coup d'envoi.</p>
           </div>
           {(()=>{
@@ -510,26 +566,26 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
               return(
                 <div key={m.id}>
                   {nd&&<div style={S.dayHeader}>📅 {fmtDay(m.kickoff)}</div>}
-                  <div style={{background:"#1e293b",border:"1px solid #334155",borderRadius:10,padding:"12px 14px",marginBottom:6}}>
+                  <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:10,padding:"12px 14px",marginBottom:8}}>
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
-                      <span style={{fontSize:11,color:"#64748b",textTransform:"uppercase"}}>{m.group||m.phase}</span>
-                      <span style={{fontSize:11,fontWeight:600}}>{lk?<span style={{color:"#f87171"}}>🔒 {fmtHour(m.kickoff)}</span>:<span style={{color:"#fbbf24"}}>⏰ {fmtHour(m.kickoff)}</span>}</span>
+                      <span style={{fontSize:11,color:"#FFD700",textTransform:"uppercase"}}>{m.group||m.phase}</span>
+                      <span style={{fontSize:11,color:"#fbbf24",fontWeight:600}}>{lk?"🔒":"⏰"} {fmtHour(m.kickoff)}</span>
                     </div>
-                    <div style={{fontSize:13,fontWeight:700,textAlign:"center",marginBottom:8}}>{m.home} <span style={{color:"#475569"}}>vs</span> {m.away}</div>
+                    <div style={{fontWeight:700,fontSize:14,color:"#fff",textAlign:"center",marginBottom:8}}>{m.home} vs {m.away}</div>
                     {lk?(
                       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
                         {players.map(p=>{
                           const pro=allPronos[p]?.[m.id];
                           return(
-                            <div key={p} style={{background:"#0f172a",border:"1px solid #334155",borderRadius:8,padding:"5px 10px",flex:"1 1 80px",textAlign:"center"}}>
-                              <div style={{fontSize:10,color:"#64748b",marginBottom:2}}>{p}</div>
-                              <div style={{fontSize:15,fontWeight:800,color:pro?"#f1f5f9":"#374151"}}>{pro?`${pro.home}–${pro.away}`:"—"}</div>
+                            <div key={p} style={{background:"#005c26",border:"1px solid #B8962E44",borderRadius:8,padding:"5px 10px",flex:"1 1 80px",textAlign:"center"}}>
+                              <div style={{fontSize:10,color:"#FFD700",marginBottom:2}}>{p}</div>
+                              <div style={{fontSize:15,fontWeight:800,color:pro?"#fff":"#374151"}}>{pro?`${pro.home}–${pro.away}`:"—"}</div>
                             </div>
                           );
                         })}
                       </div>
                     ):(
-                      <div style={{fontSize:12,color:"#4b5563",textAlign:"center",fontStyle:"italic"}}>🔒 Visible après le coup d'envoi</div>
+                      <div style={{fontSize:12,color:"#B8962E",textAlign:"center",fontStyle:"italic"}}>🔒 Visible après le coup d'envoi</div>
                     )}
                   </div>
                 </div>
@@ -547,17 +603,18 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
   useEffect(()=>setLocal(results),[results]);
   const set=(id,side,val)=>setLocal(l=>({...l,[id]:{...l[id],[side]:val}}));
   const PHASES=["Groupes","Tour de 32","8e de finale","Quart de finale","Demi-finale","3e place","Finale"];
-  const filtered=BASE_MATCHES.filter(m=>m.phase===filterPhase);
+  // Ordre inversé : matchs les plus récents en premier
+  const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase)].reverse();
   return(
     <div>
-      <h2 style={{fontSize:18,fontWeight:800,marginBottom:16}}>📊 Résultats officiels</h2>
-      <div style={{background:"linear-gradient(135deg,#0f1f3d,#0f172a)",border:"2px solid #3b82f6",borderRadius:14,padding:16,marginBottom:20,display:"flex",alignItems:"flex-start",gap:16,flexWrap:"wrap"}}>
+      <h2 style={{fontSize:18,fontWeight:800,marginBottom:16,color:"#FFD700"}}>📊 Résultats officiels</h2>
+      <div style={{background:"linear-gradient(135deg,#004d1a,#006233)",border:"2px solid #B8962E",borderRadius:14,padding:16,marginBottom:20,display:"flex",alignItems:"flex-start",gap:16,flexWrap:"wrap"}}>
         <div style={{flex:1}}>
-          <div style={{fontWeight:700,fontSize:15,marginBottom:4}}>🌐 Import automatique</div>
-          <div style={{fontSize:13,color:"#94a3b8"}}>Phase : <strong style={{color:"#93c5fd"}}>{filterPhase}</strong></div>
+          <div style={{fontWeight:700,fontSize:15,marginBottom:4,color:"#fff"}}>🌐 Import automatique</div>
+          <div style={{fontSize:13,color:"#d1fae5"}}>Phase : <strong style={{color:"#FFD700"}}>{filterPhase}</strong></div>
           {fetchLog&&<div style={{marginTop:10,padding:"8px 12px",borderRadius:8,background:fetchLog.ok?"#052e16":"#1f0a0a",border:`1px solid ${fetchLog.ok?"#166534":"#7f1d1d"}`,fontSize:13,color:fetchLog.ok?"#4ade80":"#f87171"}}>{fetchLog.ok?`✅ ${fetchLog.count} résultat(s)`:`❌ ${fetchLog.error}`}</div>}
         </div>
-        <button style={{background:"linear-gradient(135deg,#2563eb,#1d4ed8)",color:"#fff",border:"none",padding:"11px 18px",borderRadius:9,fontSize:14,fontWeight:700,cursor:fetching?"not-allowed":"pointer",opacity:fetching?.6:1,display:"flex",alignItems:"center",gap:8,flexShrink:0}} onClick={onFetchScores} disabled={fetching}>
+        <button style={{background:"linear-gradient(135deg,#B8962E,#8B6914)",color:"#000",border:"none",padding:"11px 18px",borderRadius:9,fontSize:14,fontWeight:700,cursor:fetching?"not-allowed":"pointer",opacity:fetching?.6:1,display:"flex",alignItems:"center",gap:8,flexShrink:0}} onClick={onFetchScores} disabled={fetching}>
           {fetching?<><span style={S.spinner}/>Recherche...</>:"🔄 Récupérer"}
         </button>
       </div>
@@ -566,25 +623,25 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
       </div>
       {filterPhase==="Groupes"&&(
         <div style={{...S.card,marginBottom:14}}>
-          <label style={{fontSize:13,color:"#94a3b8",display:"block",marginBottom:8}}>🏆 Champion officiel</label>
-          <input style={{background:"#0f172a",border:"1px solid #334155",color:"#f1f5f9",padding:"8px 12px",borderRadius:8,fontSize:15,outline:"none",width:"100%"}} placeholder="Équipe championne" value={local.champion||""} onChange={e=>setLocal(l=>({...l,champion:e.target.value}))}/>
+          <label style={{fontSize:13,color:"#FFD700",display:"block",marginBottom:8}}>🏆 Champion officiel</label>
+          <input style={{background:"#005c26",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"8px 12px",borderRadius:8,fontSize:15,outline:"none",width:"100%"}} placeholder="Équipe championne" value={local.champion||""} onChange={e=>setLocal(l=>({...l,champion:e.target.value}))}/>
         </div>
       )}
       {filtered.map(m=>{
         const done=local[m.id]?.home!==undefined&&local[m.id]?.home!=="";
         return(
-          <div key={m.id} style={{background:done?"#052e16":"#1e293b",border:`1px solid ${done?"#166534":"#334155"}`,borderRadius:10,padding:"12px 14px",marginBottom:8}}>
+          <div key={m.id} style={{background:done?"#004d1a":"#007a3d",border:`1px solid ${done?"#FFD700":"#B8962E44"}`,borderRadius:10,padding:"12px 14px",marginBottom:8}}>
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
-              <span style={{fontSize:11,color:"#475569",textTransform:"uppercase"}}>{m.group||m.phase}</span>
+              <span style={{fontSize:11,color:"#FFD700",textTransform:"uppercase"}}>{m.group||m.phase}</span>
               <span style={{fontSize:11,color:"#fbbf24"}}>⏰ {fmtHour(m.kickoff)}</span>
-              {done&&<span style={{background:"#166534",color:"#4ade80",fontSize:10,padding:"2px 6px",borderRadius:8,fontWeight:700}}>✓</span>}
+              {done&&<span style={{background:"#B8962E",color:"#000",fontSize:10,padding:"2px 6px",borderRadius:8,fontWeight:700}}>✓</span>}
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
-              <span style={{flex:1,fontSize:13,fontWeight:600,color:"#e2e8f0",textAlign:"center"}}>{m.home}</span>
+              <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.home}</span>
               <input style={S.scoreInput} type="number" min="0" max="20" placeholder="–" value={local[m.id]?.home??""} onChange={e=>set(m.id,"home",e.target.value)}/>
-              <span style={{color:"#475569",fontWeight:700,fontSize:18}}>–</span>
+              <span style={{color:"#B8962E",fontWeight:700,fontSize:18}}>–</span>
               <input style={S.scoreInput} type="number" min="0" max="20" placeholder="–" value={local[m.id]?.away??""} onChange={e=>set(m.id,"away",e.target.value)}/>
-              <span style={{flex:1,fontSize:13,fontWeight:600,color:"#e2e8f0",textAlign:"center"}}>{m.away}</span>
+              <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.away}</span>
             </div>
           </div>
         );
@@ -595,30 +652,31 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
 }
 
 function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
-  const PTS={5:"#16a34a",3:"#2563eb",2:"#7c3aed",1:"#d97706",0:"#dc2626"};
+  const PTS={5:"#B8962E",3:"#2563eb",2:"#7c3aed",1:"#d97706",0:"#dc2626"};
   const PHASES=["Groupes","Tour de 32","8e de finale","Quart de finale","Demi-finale","Finale"];
-  const filtered=BASE_MATCHES.filter(m=>m.phase===filterPhase&&results[m.id]?.home!==undefined);
+  // Ordre inversé : matchs les plus récents en premier
+  const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase&&results[m.id]?.home!==undefined)].reverse();
   return(
     <div style={{marginTop:32}}>
-      <h3 style={{fontSize:15,fontWeight:700,color:"#94a3b8",marginBottom:12}}>Détail par match</h3>
+      <h3 style={{fontSize:15,fontWeight:700,color:"#FFD700",marginBottom:12}}>Détail par match</h3>
       <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:16}}>
         {PHASES.map(ph=><button key={ph} style={{...S.phaseBtn,...(filterPhase===ph?S.phaseBtnOn:{})}} onClick={()=>setFilterPhase(ph)}>{ph}</button>)}
       </div>
-      {filtered.length===0?<p style={{color:"#4b5563",textAlign:"center"}}>Aucun résultat.</p>:filtered.map(m=>{
+      {filtered.length===0?<p style={{color:"#B8962E",textAlign:"center"}}>Aucun résultat.</p>:filtered.map(m=>{
         const res=results[m.id];
         return(
           <div key={m.id} style={{...S.card,marginBottom:8}}>
             <div style={{display:"flex",justifyContent:"space-between",fontWeight:700,marginBottom:10,fontSize:14}}>
-              <span>{m.home} {res.home}–{res.away} {m.away}</span>
-              <span style={{color:"#4b5563",fontSize:12}}>{m.group||m.phase}</span>
+              <span style={{color:"#fff"}}>{m.home} {res.home}–{res.away} {m.away}</span>
+              <span style={{color:"#FFD700",fontSize:12}}>{m.group||m.phase}</span>
             </div>
             {players.map(p=>{
               const pro=pronos[p]?.[m.id];
               const pts=scoreProno(pro,res);
               return(
                 <div key={p} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0"}}>
-                  <span style={{flex:1,fontSize:13,color:"#94a3b8"}}>{p}</span>
-                  <span style={{fontSize:13,fontWeight:700,minWidth:40,textAlign:"center"}}>{pro?`${pro.home}–${pro.away}`:"—"}</span>
+                  <span style={{flex:1,fontSize:13,color:"#d1fae5"}}>{p}</span>
+                  <span style={{fontSize:13,fontWeight:700,minWidth:40,textAlign:"center",color:"#fff"}}>{pro?`${pro.home}–${pro.away}`:"—"}</span>
                   <span style={{fontSize:12,fontWeight:700,color:"#fff",padding:"2px 8px",borderRadius:10,minWidth:40,textAlign:"center",background:pts!==null?PTS[pts]:"#374151"}}>{pts!==null?`${pts} pt${pts>1?"s":""}`:"—"}</span>
                 </div>
               );
