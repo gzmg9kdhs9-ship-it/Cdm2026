@@ -125,7 +125,7 @@ function scoreProno(p,r){
   const pw=ph>pa?"H":ph<pa?"A":"D",rw=rh>ra?"H":rh<ra?"A":"D",ok=pw===rw;
   if(ok&&(ph===rh||pa===ra))return 3;
   if(ok)return 2;
-  if(ph===rh||pa===ra)return 1;
+  if(Math.abs(ph-pa)===Math.abs(rh-ra)&&Math.abs(rh-ra)>0)return 1;
   return 0;
 }
 
