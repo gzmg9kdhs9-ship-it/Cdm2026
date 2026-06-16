@@ -168,8 +168,8 @@ async function dbLoad(key) {
 }
 
 const S = {
-  app:{minHeight:"100vh",background:"#005c26",color:"#f1f5f9",fontFamily:"'Inter','Segoe UI',sans-serif",paddingBottom:60},
-  header:{background:"linear-gradient(135deg,#8B0000,#C1272D 40%,#006233 100%)",borderBottom:"3px solid #B8962E",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,position:"sticky",top:0,zIndex:100},
+  app:{minHeight:"100vh",background:"#005226",color:"#f1f5f9",fontFamily:"'Inter','Segoe UI',sans-serif",paddingBottom:60},
+  header:{background:"linear-gradient(135deg,#3a0000,#C1272D 50%,#003d14)",borderBottom:"2px solid #B8962E",padding:"12px 16px",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8,position:"sticky",top:0,zIndex:100},
   page:{maxWidth:720,margin:"0 auto",padding:"20px 16px"},
   center:{maxWidth:480,margin:"0 auto",padding:"20px 16px"},
   card:{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20,marginBottom:16},
@@ -274,9 +274,26 @@ export default function App() {
   );
 
   return(
-    <div style={S.app}>
+    <div style={{...S.app,position:"relative",overflow:"hidden"}}>
+      {/* DIMA pattern sur toute l'app */}
+      <div className="dima-pattern" style={{zIndex:1}}>
+              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+            </div>
+      <div style={{position:"relative",zIndex:2}}>
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
+        .dima-pattern{position:absolute;inset:-20px;z-index:1;transform:rotate(-20deg);pointer-events:none;display:flex;flex-direction:column;gap:6px;overflow:hidden;}
+        .dima-row{display:flex;gap:14px;white-space:nowrap;font-family:'Impact',sans-serif;font-size:12px;letter-spacing:.1em;}
+        .dima-row .fr{color:rgba(255,60,60,0.22);}
+        .dima-row .ar{color:rgba(74,222,128,0.22);}
+        .dima-row .sep{color:rgba(255,215,0,0.15);}
         @keyframes floatflag{
           0%,100%{transform:translateY(-50%) rotate(3deg) scale(1);filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5)) brightness(1);}
           25%{transform:translateY(-53%) rotate(1deg) scale(1.03);filter:drop-shadow(0 14px 35px rgba(0,0,0,0.4)) brightness(1.1);}
@@ -308,22 +325,29 @@ export default function App() {
       {screen==="home"&&(
         <div style={S.center}>
           {/* HERO avec drapeau flottant + masque DIMA MAGHRIB */}
-          <div style={{position:"relative",overflow:"hidden",minHeight:220,background:"linear-gradient(135deg,#7a0000 0%,#C1272D 35%,#8B0000 55%,#006233 80%,#004d1a 100%)",borderRadius:16,marginBottom:20}}>
-            {/* Drapeau flottant vers la droite */}
-            <div style={{position:"absolute",top:"50%",left:-10,fontSize:120,lineHeight:1,animation:"floatflag 4s ease-in-out infinite",zIndex:1}}>🇲🇦</div>
-            {/* DIMA MAGHRIB en masque */}
-            <div style={{position:"absolute",top:0,left:0,right:0,bottom:0,display:"flex",alignItems:"center",justifyContent:"center",zIndex:1,pointerEvents:"none",transform:"rotate(-15deg)",animation:"maskglow 4s ease-in-out infinite"}}>
-              <div style={{textAlign:"center"}}>
-                <div style={{fontFamily:"Impact,sans-serif",fontSize:60,fontWeight:900,letterSpacing:".08em",lineHeight:0.9,background:"linear-gradient(135deg,rgba(255,215,0,0.18),rgba(255,255,255,0.22),rgba(255,215,0,0.1))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",whiteSpace:"nowrap"}}>DIMA MAGHRIB</div>
-                <div style={{fontSize:40,background:"linear-gradient(135deg,rgba(255,255,255,0.12),rgba(255,215,0,0.15))",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",lineHeight:1}}>ديما المغرب</div>
-              </div>
+          <div style={{position:"relative",overflow:"hidden",background:"linear-gradient(160deg,#5a0000 0%,#A01020 30%,#6a0000 55%,#003010 80%,#001a08 100%)",borderRadius:16,marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",padding:"22px 20px 20px",gap:16}}>
+            {/* Drapeaux masque fond */}
+            <div style={{position:"absolute",inset:0,zIndex:0,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",overflow:"hidden",borderRadius:16}}>
+              {["","",""].map((_,i)=><div key={i} style={{overflow:"hidden"}}><img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg" style={{width:"100%",height:"100%",objectFit:"cover",opacity:i===0?.28:i===1?.18:.14,filter:"saturate(0.6)",transform:i===1?"scaleX(-1)":"none"}} alt=""/></div>)}
             </div>
-            {/* Contenu hero */}
-            <div style={{position:"relative",zIndex:2,padding:"22px 22px 18px",textAlign:"right"}}>
-              <div style={{display:"inline-flex",alignItems:"center",gap:6,background:"#B8962E",color:"#000",fontSize:10,fontWeight:800,letterSpacing:".15em",padding:"4px 12px",borderRadius:20,textTransform:"uppercase",marginBottom:12}}>🏆 Pronostics · Édition 2026</div>
-              <div style={{fontFamily:"Impact,sans-serif",fontSize:50,color:"#fff",lineHeight:.9,letterSpacing:".02em",textShadow:"3px 3px 0px rgba(0,0,0,0.5)"}}>COUPE<br/>DU <span style={{color:"#4ade80"}}>MONDE</span><br/><span style={{color:"#FFD700"}}>2026</span></div>
-              <div style={{fontFamily:"Impact,sans-serif",fontSize:15,color:"#FFD700",letterSpacing:".25em",marginTop:12,animation:"textglow 3s ease-in-out infinite"}}>✦ DIMA MAGHRIB ✦</div>
-              <div style={{fontSize:18,color:"rgba(255,255,255,0.85)",marginTop:3}}>ديما المغرب</div>
+            {/* DIMA pattern en biais */}
+            <div className="dima-pattern">
+              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+            </div>
+            {/* Overlay */}
+            <div style={{position:"absolute",inset:0,zIndex:2,background:"linear-gradient(160deg,rgba(70,0,0,0.5),rgba(0,0,0,0.05),rgba(0,40,10,0.6))",borderRadius:16,pointerEvents:"none"}}/>
+            {/* Contenu */}
+            <div style={{position:"relative",zIndex:4,display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
+              <div style={{background:"linear-gradient(135deg,#8B6914,#B8962E,#FFD700,#B8962E,#8B6914)",color:"#2a0800",fontFamily:"'Bebas Neue',Impact,sans-serif",fontSize:14,letterSpacing:".18em",padding:"7px 22px",borderRadius:30,boxShadow:"0 4px 20px rgba(184,150,46,0.6)",textAlign:"center"}}>⚽ PRONOS · COUPE DU MONDE 2026 ⚽</div>
+              <div style={{position:"relative",width:140,height:93,animation:"floatflag 4s ease-in-out infinite",filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.8)) drop-shadow(0 0 16px rgba(255,215,0,0.25))"}}>
+                <div style={{position:"absolute",left:-5,top:-6,bottom:-6,width:5,background:"linear-gradient(180deg,#FFD700,#B8962E,#FFD700)",borderRadius:3,boxShadow:"0 0 10px rgba(255,215,0,0.7)"}}/>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:3}} alt="🇲🇦"/>
+              </div>
             </div>
           </div>
           {/* Divider tricolore */}
@@ -424,6 +448,7 @@ export default function App() {
           <ScoreDetails players={players} pronos={pronos} results={results} filterPhase={filterPhase} setFilterPhase={setFilterPhase}/>
         </div>
       )}
+      </div>
     </div>
   );
 }
