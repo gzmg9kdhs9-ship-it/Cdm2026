@@ -291,8 +291,8 @@ export default function App() {
         @keyframes spin{to{transform:rotate(360deg)}}
         .dima-pattern{position:absolute;inset:-20px;z-index:1;transform:rotate(-20deg);pointer-events:none;display:flex;flex-direction:column;gap:6px;overflow:hidden;}
         .dima-row{display:flex;gap:14px;white-space:nowrap;font-family:'Impact',sans-serif;font-size:12px;letter-spacing:.1em;}
-        .dima-row .fr{color:rgba(255,60,60,0.22);}
-        .dima-row .ar{color:rgba(74,222,128,0.22);}
+        .dima-row .fr{color:rgba(255,60,60,0.16);}
+        .dima-row .ar{color:rgba(74,222,128,0.16);}
         .dima-row .sep{color:rgba(255,215,0,0.15);}
         @keyframes floatflag{
           0%,100%{transform:translateY(-50%) rotate(3deg) scale(1);filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5)) brightness(1);}
@@ -342,11 +342,13 @@ export default function App() {
             {/* Overlay */}
             <div style={{position:"absolute",inset:0,zIndex:2,background:"linear-gradient(160deg,rgba(70,0,0,0.5),rgba(0,0,0,0.05),rgba(0,40,10,0.6))",borderRadius:16,pointerEvents:"none"}}/>
             {/* Contenu */}
-            <div style={{position:"relative",zIndex:4,display:"flex",flexDirection:"column",alignItems:"center",gap:16}}>
-              <div style={{background:"linear-gradient(135deg,#8B6914,#B8962E,#FFD700,#B8962E,#8B6914)",color:"#2a0800",fontFamily:"'Bebas Neue',Impact,sans-serif",fontSize:14,letterSpacing:".18em",padding:"7px 22px",borderRadius:30,boxShadow:"0 4px 20px rgba(184,150,46,0.6)",textAlign:"center"}}>⚽ PRONOS · COUPE DU MONDE 2026 ⚽</div>
-              <div style={{position:"relative",width:140,height:93,animation:"floatflag 4s ease-in-out infinite",filter:"drop-shadow(0 8px 24px rgba(0,0,0,0.8)) drop-shadow(0 0 16px rgba(255,215,0,0.25))"}}>
-                <div style={{position:"absolute",left:-5,top:-6,bottom:-6,width:5,background:"linear-gradient(180deg,#FFD700,#B8962E,#FFD700)",borderRadius:3,boxShadow:"0 0 10px rgba(255,215,0,0.7)"}}/>
-                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:3}} alt="🇲🇦"/>
+            <div style={{position:"relative",zIndex:4,display:"flex",flexDirection:"column",alignItems:"center",gap:14,padding:"4px 0"}}>
+              {/* Badge doré en premier */}
+              <div style={{background:"linear-gradient(135deg,#8B6914,#B8962E,#FFD700,#B8962E,#8B6914)",color:"#2a0800",fontFamily:"'Bebas Neue',Impact,sans-serif",fontSize:13,letterSpacing:".15em",padding:"6px 20px",borderRadius:30,boxShadow:"0 4px 20px rgba(184,150,46,0.6)",textAlign:"center",whiteSpace:"nowrap"}}>⚽ PRONOS · COUPE DU MONDE 2026 ⚽</div>
+              {/* Drapeau en dessous, taille réduite */}
+              <div style={{position:"relative",width:100,height:67,animation:"floatflag 4s ease-in-out infinite",filter:"drop-shadow(0 6px 18px rgba(0,0,0,0.8)) drop-shadow(0 0 12px rgba(255,215,0,0.2))"}}>
+                <div style={{position:"absolute",left:-4,top:-5,bottom:-5,width:4,background:"linear-gradient(180deg,#FFD700,#B8962E,#FFD700)",borderRadius:2,boxShadow:"0 0 8px rgba(255,215,0,0.7)"}}/>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg" style={{width:"100%",height:"100%",objectFit:"cover",borderRadius:2}} alt="🇲🇦"/>
               </div>
             </div>
           </div>
