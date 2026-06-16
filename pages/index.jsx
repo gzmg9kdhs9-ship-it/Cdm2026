@@ -603,19 +603,8 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
   useEffect(()=>setLocal(results),[results]);
   const set=(id,side,val)=>setLocal(l=>({...l,[id]:{...l[id],[side]:val}}));
   const PHASES=["Groupes","Tour de 32","8e de finale","Quart de finale","Demi-finale","3e place","Finale"];
-  // Tri : matchs terminés sans résultat en premier (plus anciens d'abord), puis le reste
-  const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase)].sort((a,b)=>{
-    const aLocked=isLocked(a.kickoff);
-    const bLocked=isLocked(b.kickoff);
-    const aDone=local[a.id]?.home!==undefined&&local[a.id]?.home!=='';
-    const bDone=local[b.id]?.home!==undefined&&local[b.id]?.home!=='';
-    const aNeedsResult=aLocked&&!aDone;
-    const bNeedsResult=bLocked&&!bDone;
-    if(aNeedsResult&&!bNeedsResult)return -1;
-    if(!aNeedsResult&&bNeedsResult)return 1;
-    if(aNeedsResult&&bNeedsResult)return new Date(a.kickoff)-new Date(b.kickoff);
-    return new Date(b.kickoff)-new Date(a.kickoff);
-  });
+  // Ordre : matchs les plus récents en premier
+  const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase)].reverse();
   return(
     <div>
       <h2 style={{fontSize:18,fontWeight:800,marginBottom:16,color:"#FFD700"}}>📊 Résultats officiels</h2>
@@ -630,7 +619,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
         </button>
       </div>
       {(()=>{
-        const tk=todayKey();
+        const tk=dayKey(new Date().toISOString());
         const todayNeedsResult=BASE_MATCHES.filter(m=>m.phase===filterPhase&&isLocked(m.kickoff)&&dayKey(m.kickoff)===tk&&(local[m.id]?.home===undefined||local[m.id]?.home===''));
         if(todayNeedsResult.length===0)return null;
         return(
