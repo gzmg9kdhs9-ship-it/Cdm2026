@@ -538,9 +538,9 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
                     </div>
                     <div style={{display:"flex",alignItems:"center",gap:8}}>
                       <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.home}</span>
-                      <input style={{background:lk?"#1a0808":"#004d1a",border:`1px solid ${lk?"#7f1d1d":"#B8962E44"}`,color:lk?"#4b5563":"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"}} type="number" min="0" max="20" placeholder="0" disabled={lk} value={local[m.id]?.home??""} onChange={e=>!lk&&set(m.id,"home",e.target.value)}/>
+                      <input style={{background:lk?"#1a0808":"#004d1a",border:`1px solid ${lk?"#7f1d1d":(local[m.id]?.home===undefined||local[m.id]?.home===""?"#dc2626":"#B8962E44")}`,color:lk?"#4b5563":"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"}} type="number" min="0" max="20" placeholder="?" disabled={lk} value={local[m.id]?.home??""} onChange={e=>!lk&&set(m.id,"home",e.target.value)}/>
                       <span style={{color:"#B8962E",fontWeight:700,fontSize:18}}>–</span>
-                      <input style={{background:lk?"#1a0808":"#004d1a",border:`1px solid ${lk?"#7f1d1d":"#B8962E44"}`,color:lk?"#4b5563":"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"}} type="number" min="0" max="20" placeholder="0" disabled={lk} value={local[m.id]?.away??""} onChange={e=>!lk&&set(m.id,"away",e.target.value)}/>
+                      <input style={{background:lk?"#1a0808":"#004d1a",border:`1px solid ${lk?"#7f1d1d":(local[m.id]?.away===undefined||local[m.id]?.away===""?"#dc2626":"#B8962E44")}`,color:lk?"#4b5563":"#f1f5f9",width:48,height:40,textAlign:"center",borderRadius:6,fontSize:18,fontWeight:700,outline:"none"}} type="number" min="0" max="20" placeholder="?" disabled={lk} value={local[m.id]?.away??""} onChange={e=>!lk&&set(m.id,"away",e.target.value)}/>
                       <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.away}</span>
                     </div>
                     {lk&&results[m.id]&&<div style={{textAlign:"center",fontSize:12,color:"#4ade80",marginTop:6}}>Résultat : {results[m.id].home}–{results[m.id].away}</div>}
@@ -549,7 +549,26 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
               );
             });
           })()}
-          <button style={{...S.btn,marginTop:8}} onClick={()=>onSave(local)}>💾 Sauvegarder mes pronos</button>
+          <button style={{...S.btn,marginTop:8}} onClick={()=>{
+            const incomplete=SORTED.filter(m=>{
+              if(isLocked(m.kickoff))return false;
+              const h=local[m.id]?.home;
+              const a=local[m.id]?.away;
+              const hFilled=h!==undefined&&h!=='';
+              const aFilled=a!==undefined&&a!=='';
+              return hFilled!==aFilled;
+            });
+            if(incomplete.length>0){
+              const names=incomplete.map(m=>m.home+' - '+m.away).join('
+');
+              alert('⚠️ Prono incomplet !
+Tu dois remplir LES DEUX scores ou laisser le match vide :
+
+'+names);
+              return;
+            }
+            onSave(local);
+          }}>💾 Sauvegarder mes pronos</button>
         </>
       )}
       {view==="all"&&(
