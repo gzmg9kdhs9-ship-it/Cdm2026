@@ -497,9 +497,10 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
   const locked=SORTED.filter(m=>isLocked(m.kickoff)).length;
   const open=SORTED.length-locked;
 
-  // Matchs du jour
+  // Matchs du jour + lendemain (non verrouillés)
   const tk=todayKey();
-  const todayMatches=SORTED.filter(m=>dayKey(m.kickoff)===tk&&!isLocked(m.kickoff));
+  const tmKey=(()=>{const d=new Date();d.setDate(d.getDate()+1);const tm=new Date(d.toLocaleString("en-US",{timeZone:TZ}));return `${tm.getFullYear()}-${tm.getMonth()}-${tm.getDate()}`;})();
+  const todayMatches=SORTED.filter(m=>(dayKey(m.kickoff)===tk||dayKey(m.kickoff)===tmKey)&&!isLocked(m.kickoff));
 
   return(
     <div>
@@ -517,7 +518,7 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
       {/* SECTION MATCHS DU JOUR */}
       {todayMatches.length>0&&(
         <div style={{background:"linear-gradient(135deg,#7a0000,#C1272D)",border:"2px solid #FFD700",borderRadius:14,padding:16,marginBottom:16}}>
-          <div style={{fontFamily:"Impact,sans-serif",fontSize:18,color:"#FFD700",letterSpacing:".1em",marginBottom:12}}>⚡ MATCHS DU JOUR — À PRONO !</div>
+          <div style={{fontFamily:"Impact,sans-serif",fontSize:18,color:"#FFD700",letterSpacing:".1em",marginBottom:12}}>⚡ MATCHS DU JOUR & DEMAIN — À PRONO !</div>
           {todayMatches.map(m=>(
             <div key={m.id} style={{background:"rgba(0,0,0,0.3)",borderRadius:10,padding:"12px 14px",marginBottom:8}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
@@ -585,14 +586,19 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
             <p style={{margin:0,fontSize:13,color:"#4ade80"}}>👥 Pronos visibles après le coup d'envoi.</p>
           </div>
           {(()=>{
-            let lastDay=null;
-            return SORTED.map(m=>{
+            const lockedMatches=[...SORTED.filter(m=>isLocked(m.kickoff))].reverse();
+            const upcomingMatches=SORTED.filter(m=>!isLocked(m.kickoff));
+            const ordered=[...lockedMatches,...upcomingMatches];
+            let lastDay=null;let lastLockState=null;
+            return ordered.map(m=>{
               const lk=isLocked(m.kickoff);
               const dk=dayKey(m.kickoff);
-              const nd=dk!==lastDay;lastDay=dk;
+              const stateChanged=lk!==lastLockState;
+              const nd=(dk!==lastDay)||stateChanged;lastDay=dk;lastLockState=lk;
               return(
                 <div key={m.id}>
-                  {nd&&<div style={S.dayHeader}>📅 {fmtDay(m.kickoff)}</div>}
+                  {stateChanged&&<div style={{...S.dayHeader,background:lk?"#7a0000":"#004d1a",color:"#fff"}}>{lk?"🔓 Matchs en cours / terminés":"⏳ Matchs à venir"}</div>}
+                  {nd&&!stateChanged&&<div style={S.dayHeader}>📅 {fmtDay(m.kickoff)}</div>}
                   <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:10,padding:"12px 14px",marginBottom:8}}>
                     <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
                       <span style={{fontSize:11,color:"#FFD700",textTransform:"uppercase"}}>{m.group||m.phase}</span>
