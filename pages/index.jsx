@@ -143,6 +143,32 @@ function computeStandings(players,pronos,results){
   }).sort((a,b)=>b.total-a.total||b.exact-a.exact||b.winners-a.winners);
 }
 
+function computeGroupStandings(results){
+  const groups={};
+  BASE_MATCHES.filter(m=>m.phase==="Groupes").forEach(m=>{
+    if(!groups[m.group])groups[m.group]={};
+    [m.home,m.away].forEach(team=>{
+      if(!groups[m.group][team])groups[m.group][team]={team,pj:0,g:0,n:0,p:0,bp:0,bc:0,diff:0,pts:0};
+    });
+  });
+  BASE_MATCHES.filter(m=>m.phase==="Groupes").forEach(m=>{
+    const res=results[m.id];
+    if(!res||res.home===undefined||res.home==="")return;
+    const hg=parseInt(res.home),ag=parseInt(res.away);
+    if(isNaN(hg)||isNaN(ag))return;
+    const h=groups[m.group][m.home],a=groups[m.group][m.away];
+    h.pj++;a.pj++;h.bp+=hg;h.bc+=ag;a.bp+=ag;a.bc+=hg;
+    if(hg>ag){h.g++;a.p++;h.pts+=3;}
+    else if(hg<ag){a.g++;h.p++;a.pts+=3;}
+    else{h.n++;a.n++;h.pts+=1;a.pts+=1;}
+  });
+  const out={};
+  Object.keys(groups).sort().forEach(g=>{
+    out[g]=Object.values(groups[g]).map(t=>({...t,diff:t.bp-t.bc})).sort((a,b)=>b.pts-a.pts||b.diff-a.diff||b.bp-a.bp);
+  });
+  return out;
+}
+
 async function dbSave(key, value) {
   try {
     await fetch("/api/db", {
@@ -315,7 +341,7 @@ export default function App() {
         {screen!=="home"&&screen!=="adminSetup"&&(
           <nav style={{display:"flex",gap:4,flexWrap:"wrap",alignItems:"center"}}>
             {activePlayer&&<span style={{background:"rgba(0,0,0,0.3)",border:"1px solid #FFD700",color:"#FFD700",padding:"4px 10px",borderRadius:20,fontSize:12,fontWeight:600}}>👤 {activePlayer}</span>}
-            {[["prono","📝"],["results","📊"],["standings","🏆"]].map(([s,l])=>(
+            {[["prono","📝"],["results","📊"],["groups","⚽"],["standings","🏆"]].map(([s,l])=>(
               <button key={s} style={{...S.navBtn,...(screen===s?S.navBtnOn:{})}} onClick={()=>setScreen(s)}>{l}</button>
             ))}
           </nav>
@@ -416,6 +442,39 @@ export default function App() {
           ):(
             <ResultsForm results={results} filterPhase={filterPhase} setFilterPhase={setFilterPhase} onSave={saveResults} onFetchScores={handleFetchScores} fetching={fetchingScores} fetchLog={scoresLog}/>
           )}
+        </div>
+      )}
+
+      {screen==="groups"&&(
+        <div style={S.page}>
+          <h2 style={{fontSize:20,fontWeight:800,textAlign:"center",marginBottom:20,color:"#FFD700"}}>⚽ Classement des Groupes</h2>
+          {Object.entries(computeGroupStandings(results)).map(([groupName,teams])=>(
+            <div key={groupName} style={{...S.card,marginBottom:16,padding:0,overflow:"hidden"}}>
+              <div style={{background:"linear-gradient(135deg,#7a0000,#C1272D)",padding:"10px 14px",fontFamily:"Impact,sans-serif",fontSize:16,color:"#FFD700",letterSpacing:".08em"}}>{groupName.toUpperCase()}</div>
+              <div style={{padding:"10px 8px"}}>
+                <div style={{display:"flex",fontSize:10,color:"#B8962E",fontWeight:700,padding:"0 6px 6px",borderBottom:"1px solid #B8962E33",marginBottom:4}}>
+                  <span style={{flex:3}}>Équipe</span>
+                  <span style={{width:24,textAlign:"center"}}>J</span>
+                  <span style={{width:24,textAlign:"center"}}>G</span>
+                  <span style={{width:24,textAlign:"center"}}>N</span>
+                  <span style={{width:24,textAlign:"center"}}>P</span>
+                  <span style={{width:30,textAlign:"center"}}>Diff</span>
+                  <span style={{width:30,textAlign:"center"}}>Pts</span>
+                </div>
+                {teams.map((t,i)=>(
+                  <div key={t.team} style={{display:"flex",alignItems:"center",padding:"6px",borderRadius:6,background:i<2?"rgba(74,222,128,0.1)":"transparent",marginBottom:2}}>
+                    <span style={{flex:3,fontSize:13,fontWeight:i<2?800:600,color:i<2?"#4ade80":"#f1f5f9"}}>{i+1}. {t.team}</span>
+                    <span style={{width:24,textAlign:"center",fontSize:12,color:"#d1fae5"}}>{t.pj}</span>
+                    <span style={{width:24,textAlign:"center",fontSize:12,color:"#d1fae5"}}>{t.g}</span>
+                    <span style={{width:24,textAlign:"center",fontSize:12,color:"#d1fae5"}}>{t.n}</span>
+                    <span style={{width:24,textAlign:"center",fontSize:12,color:"#d1fae5"}}>{t.p}</span>
+                    <span style={{width:30,textAlign:"center",fontSize:12,color:"#d1fae5"}}>{t.diff>0?"+":""}{t.diff}</span>
+                    <span style={{width:30,textAlign:"center",fontSize:14,fontWeight:800,color:"#FFD700"}}>{t.pts}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       )}
 
