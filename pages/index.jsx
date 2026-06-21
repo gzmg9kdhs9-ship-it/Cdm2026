@@ -132,7 +132,7 @@ function scoreProno(p,r){
 function computeStandings(players,pronos,results){
   return players.map(name=>{
     let total=0,exact=0,winners=0,consec=0,maxC=0;
-    const filled=Object.keys(pronos[name]||{}).filter(k=>k!=="champion").length;
+    const filled=BASE_MATCHES.filter(m=>isLocked(m.kickoff)&&pronos[name]?.[m.id]?.home!==undefined&&pronos[name][m.id].home!=="").length;
     BASE_MATCHES.forEach(m=>{
       const pts=scoreProno(pronos[name]?.[m.id],results[m.id]);
       if(pts!==null){total+=pts;if(pts===5)exact++;if(pts>=2){winners++;consec++;maxC=Math.max(maxC,consec);}else consec=0;}
@@ -495,17 +495,23 @@ export default function App() {
             {results.champion&&<div style={{marginTop:10,color:"#FFD700",fontSize:14}}>🏅 Champion réel : <strong>{results.champion}</strong></div>}
           </div>
           {standings.map((s,i)=>(
-            <div key={s.name} style={{...S.card,display:"flex",alignItems:"center",gap:12,marginBottom:8,border:i===0?"2px solid #FFD700":i===standings.length-1?"1px solid #dc2626":"1px solid #B8962E44"}}>
-              <span style={{fontSize:22,minWidth:36}}>{["🥇","🥈","🥉"][i]||`#${i+1}`}</span>
-              <span style={{fontSize:17,fontWeight:800,flex:1,color:"#fff"}}>{s.name}</span>
-              <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center"}}>
+            <div key={s.name} style={{...S.card,marginBottom:8,border:i===0?"2px solid #FFD700":i===standings.length-1?"1px solid #dc2626":"1px solid #B8962E44"}}>
+              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
+                <span style={{fontSize:22,minWidth:36}}>{["🥇","🥈","🥉"][i]||`#${i+1}`}</span>
+                <span style={{fontSize:17,fontWeight:800,flex:1,color:"#fff"}}>{s.name}</span>
                 <span style={{fontSize:20,fontWeight:900,color:"#FFD700"}}>{s.total} pts</span>
-                <span style={S.chip}>📝 {s.filled}</span>
-                <span style={S.chip}>✅ {s.exact}</span>
-                <span style={S.chip}>🎯 {s.winners}</span>
-                {s.cb>0&&<span style={S.bonus}>+{s.cb} Carré</span>}
-                {s.champ>0&&<span style={S.bonus}>+{s.champ} 🏆</span>}
               </div>
+              <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:6}}>
+                <div style={{...S.chip,display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"6px 4px"}}>📝 <b>{s.filled}</b></div>
+                <div style={{...S.chip,display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"6px 4px"}}>✅ <b>{s.exact}</b></div>
+                <div style={{...S.chip,display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"6px 4px"}}>🎯 <b>{s.winners}</b></div>
+              </div>
+              {(s.cb>0||s.champ>0)&&(
+                <div style={{display:"flex",gap:6,marginTop:6,flexWrap:"wrap"}}>
+                  {s.cb>0&&<span style={S.bonus}>+{s.cb} Carré</span>}
+                  {s.champ>0&&<span style={S.bonus}>+{s.champ} 🏆</span>}
+                </div>
+              )}
             </div>
           ))}
           <ScoreDetails players={players} pronos={pronos} results={results} filterPhase={filterPhase} setFilterPhase={setFilterPhase}/>
