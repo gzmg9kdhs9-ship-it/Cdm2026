@@ -132,6 +132,7 @@ function scoreProno(p,r){
 function computeStandings(players,pronos,results){
   return players.map(name=>{
     let total=0,exact=0,winners=0,consec=0,maxC=0;
+    const filled=Object.keys(pronos[name]||{}).filter(k=>k!=="champion").length;
     BASE_MATCHES.forEach(m=>{
       const pts=scoreProno(pronos[name]?.[m.id],results[m.id]);
       if(pts!==null){total+=pts;if(pts===5)exact++;if(pts>=2){winners++;consec++;maxC=Math.max(maxC,consec);}else consec=0;}
@@ -139,7 +140,7 @@ function computeStandings(players,pronos,results){
     });
     const cb=Math.floor(maxC/5)*3;
     const champ=pronos[name]?.champion&&results.champion&&pronos[name].champion===results.champion?10:0;
-    return{name,total:total+cb+champ,exact,winners,cb,champ};
+    return{name,total:total+cb+champ,exact,winners,cb,champ,filled};
   }).sort((a,b)=>b.total-a.total||b.exact-a.exact||b.winners-a.winners);
 }
 
@@ -499,6 +500,7 @@ export default function App() {
               <span style={{fontSize:17,fontWeight:800,flex:1,color:"#fff"}}>{s.name}</span>
               <div style={{display:"flex",flexWrap:"wrap",gap:6,alignItems:"center"}}>
                 <span style={{fontSize:20,fontWeight:900,color:"#FFD700"}}>{s.total} pts</span>
+                <span style={S.chip}>📝 {s.filled}</span>
                 <span style={S.chip}>✅ {s.exact}</span>
                 <span style={S.chip}>🎯 {s.winners}</span>
                 {s.cb>0&&<span style={S.bonus}>+{s.cb} Carré</span>}
