@@ -102,16 +102,69 @@ function fmtHour(iso){return new Date(iso).toLocaleTimeString("fr-FR",{timeZone:
 function dayKey(iso){const d=new Date(new Date(iso).toLocaleString("en-US",{timeZone:TZ}));return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
 function todayKey(){const d=new Date(new Date().toLocaleString("en-US",{timeZone:TZ}));return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
 
-function scoreProno(p,r){
+function scoreProno(p,r,isKnockout){
   if(!p||!r)return null;
   const ph=parseInt(p.home),pa=parseInt(p.away),rh=parseInt(r.home),ra=parseInt(r.away);
   if(isNaN(ph)||isNaN(pa)||isNaN(rh)||isNaN(ra))return null;
-  if(ph===rh&&pa===ra)return 5;
-  const pw=ph>pa?"H":ph<pa?"A":"D",rw=rh>ra?"H":rh<ra?"A":"D",ok=pw===rw;
-  if(ok&&(ph===rh||pa===ra))return 3;
-  if(ok)return 2;
-  if(Math.abs(ph-pa)===Math.abs(rh-ra)&&Math.abs(rh-ra)>0)return 1;
-  return 0;
+
+  if(!isKnockout){
+    if(ph===rh&&pa===ra)return 5;
+    const pw=ph>pa?"H":ph<pa?"A":"D",rw=rh>ra?"H":rh<ra?"A":"D",ok=pw===rw;
+    if(ok&&(ph===rh||pa===ra))return 3;
+    if(ok)return 2;
+    return 0;
+  }
+
+  // PHASE ELIMINATOIRE
+  const realNul=(rh===ra);
+  const pronoNul=(ph===pa);
+
+  // Score exact à 90 min (victoire)
+  if(!realNul&&ph===rh&&pa===ra)return 10;
+
+  if(realNul){
+    const pronoWinner=p.winner||null;
+    const realWinner=r.winner||null;
+    const realIssue=r.issue||null;
+    const goodWinner=pronoWinner&&realWinner&&pronoWinner===realWinner;
+    if(pronoNul){
+      // Nul exact à 90 min
+      if(goodWinner){
+        if(realIssue==="prol"){
+          const prh=parseInt(p.extraHome),pra=parseInt(p.extraAway),rrh=parseInt(r.extraHome),rra=parseInt(r.extraAway);
+          if(!isNaN(prh)&&!isNaN(pra)&&prh===rrh&&pra===rra)return 10;
+          return 7;
+        }
+        if(realIssue==="pen")return 10;
+      }
+      return 3; // nul exact + mauvais vainqueur
+    }
+    // Nul approx
+    if(goodWinner)return 4;
+    return 2; // nul approx + mauvais vainqueur
+  }
+
+  // Victoire prédite à 90 min mais match nul en réalité → prolongation ou penalty
+  const pw=ph>pa?"H":ph<pa?"A":"D";
+  if(realNul){
+    const realWinner=r.winner||null;
+    const pronoWinner=pw==="H"?m_home:m_away; // on déduit le vainqueur prédit du score
+    // On ne peut pas comparer sans connaître m.home/m.away ici
+    // On utilise p.predictedWinner si dispo, sinon on compare avec r.winner
+    const predW=ph>pa?"home":"away";
+    const realW=r.winner||null;
+    // Le vainqueur prédit = l'équipe qui gagne selon le score prédit
+    const goodWinner=realW&&((predW==="home"&&realW==="home")||(predW==="away"&&realW==="away"));
+    if(goodWinner&&r.issue==="prol")return 3;
+    if(goodWinner&&r.issue==="pen")return 2;
+    return 0;
+  }
+  const rw=rh>ra?"H":rh<ra?"A":"D",ok=pw===rw;
+  if(!ok)return 0;
+  if(ph===rh||pa===ra)return 7;
+  const sameDiff=Math.abs(ph-pa)===Math.abs(rh-ra);
+  if(sameDiff)return 6;
+  return 5;
 }
 
 function computeStandings(players,pronos,results){
@@ -119,7 +172,7 @@ function computeStandings(players,pronos,results){
     let total=0,exact=0,winners=0,consec=0,maxC=0;
     const filled=BASE_MATCHES.filter(m=>isLocked(m.kickoff)&&pronos[name]?.[m.id]?.home!==undefined&&pronos[name][m.id].home!=="").length;
     BASE_MATCHES.forEach(m=>{
-      const pts=scoreProno(pronos[name]?.[m.id],results[m.id]);
+      const pts=scoreProno(pronos[name]?.[m.id],results[m.id],m.phase!=="Groupes");
       if(pts!==null){total+=pts;if(pts===5)exact++;if(pts>=2){winners++;consec++;maxC=Math.max(maxC,consec);}else consec=0;}
       else consec=0;
     });
@@ -548,7 +601,11 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
       {todayMatches.length>0&&(
         <div style={{background:"linear-gradient(135deg,#7a0000,#C1272D)",border:"2px solid #FFD700",borderRadius:14,padding:16,marginBottom:16}}>
           <div style={{fontFamily:"Impact,sans-serif",fontSize:18,color:"#FFD700",letterSpacing:".1em",marginBottom:12}}>⚡ MATCHS DU JOUR & DEMAIN — À PRONO !</div>
-          {todayMatches.map(m=>(
+          {todayMatches.map(m=>{
+            const isKO=m.phase!=="Groupes";
+            const p=local[m.id]||{};
+            const isNul=p.home!==undefined&&p.away!==undefined&&p.home!==""&&p.away!==""&&parseInt(p.home)===parseInt(p.away);
+            return(
             <div key={m.id} style={{background:"rgba(0,0,0,0.3)",borderRadius:10,padding:"12px 14px",marginBottom:8}}>
               <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
                 <span style={{fontSize:11,color:"#FFD700",textTransform:"uppercase",fontWeight:700}}>{m.group||m.phase}</span>
@@ -556,13 +613,50 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
               </div>
               <div style={{display:"flex",alignItems:"center",gap:8}}>
                 <span style={{flex:1,fontSize:13,fontWeight:700,color:"#fff",textAlign:"center"}}>{m.home}</span>
-                <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #FFD700",color:"#fff",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="0" value={local[m.id]?.home??""} onChange={e=>set(m.id,"home",e.target.value)}/>
+                <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #FFD700",color:"#fff",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="0" value={p.home??""} onChange={e=>set(m.id,"home",e.target.value)}/>
                 <span style={{color:"#FFD700",fontWeight:900,fontSize:20}}>–</span>
-                <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #FFD700",color:"#fff",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="0" value={local[m.id]?.away??""} onChange={e=>set(m.id,"away",e.target.value)}/>
+                <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #FFD700",color:"#fff",width:48,height:42,textAlign:"center",borderRadius:8,fontSize:20,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="0" value={p.away??""} onChange={e=>set(m.id,"away",e.target.value)}/>
                 <span style={{flex:1,fontSize:13,fontWeight:700,color:"#fff",textAlign:"center"}}>{m.away}</span>
               </div>
+              {isKO&&isNul&&(
+                <div style={{marginTop:10,background:"rgba(0,0,0,0.3)",borderRadius:8,padding:10}}>
+                  <div style={{fontSize:12,color:"#FFD700",fontWeight:700,marginBottom:8}}>🔄 Nul à 90 min — Qui gagne ensuite ?</div>
+                  <div style={{display:"flex",gap:6,marginBottom:8}}>
+                    {["prol","pen"].map(issue=>(
+                      <button key={issue} onClick={()=>set(m.id,"issue",p.issue===issue?null:issue)} style={{flex:1,padding:"7px 4px",borderRadius:7,border:`2px solid ${p.issue===issue?"#FFD700":"#B8962E44"}`,background:p.issue===issue?"#FFD700":"rgba(0,0,0,0.3)",color:p.issue===issue?"#000":"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>
+                        {issue==="prol"?"⏱️ Prolongation":"🥅 Penalties"}
+                      </button>
+                    ))}
+                  </div>
+                  {p.issue&&(
+                    <div>
+                      <div style={{fontSize:12,color:"#d1fae5",marginBottom:6}}>Vainqueur :</div>
+                      <div style={{display:"flex",gap:6,marginBottom:p.issue==="prol"?8:0}}>
+                        {[m.home,m.away].map(team=>(
+                          <button key={team} onClick={()=>set(m.id,"winner",p.winner===team?null:team)} style={{flex:1,padding:"7px 4px",borderRadius:7,border:`2px solid ${p.winner===team?"#4ade80":"#B8962E44"}`,background:p.winner===team?"#166534":"rgba(0,0,0,0.3)",color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer"}}>
+                            {p.winner===team?"✅ ":""}{team}
+                          </button>
+                        ))}
+                      </div>
+                      {p.issue==="prol"&&(
+                        <div style={{marginTop:8}}>
+                          <div style={{fontSize:12,color:"#d1fae5",marginBottom:6}}>Score après prolongation :</div>
+                          <div style={{display:"flex",alignItems:"center",gap:8}}>
+                            <span style={{flex:1,fontSize:12,color:"#fff",textAlign:"center"}}>{m.home}</span>
+                            <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #B8962E",color:"#fff",width:42,height:36,textAlign:"center",borderRadius:6,fontSize:16,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="?" value={p.extraHome??""} onChange={e=>set(m.id,"extraHome",e.target.value)}/>
+                            <span style={{color:"#FFD700",fontWeight:700}}>–</span>
+                            <input style={{background:"rgba(0,0,0,0.4)",border:"2px solid #B8962E",color:"#fff",width:42,height:36,textAlign:"center",borderRadius:6,fontSize:16,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="?" value={p.extraAway??""} onChange={e=>set(m.id,"extraAway",e.target.value)}/>
+                            <span style={{flex:1,fontSize:12,color:"#fff",textAlign:"center"}}>{m.away}</span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          ))}
+            );
+          })}
           <button style={{background:"linear-gradient(135deg,#B8962E,#8B6914)",color:"#000",border:"none",padding:"13px",borderRadius:10,fontSize:15,fontWeight:800,cursor:"pointer",width:"100%",marginTop:4}} onClick={()=>onSave(local)}>⚡ Valider mes pronos du jour !</button>
         </div>
       )}
@@ -599,6 +693,47 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
                       <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.away}</span>
                     </div>
                     {lk&&results[m.id]&&<div style={{textAlign:"center",fontSize:12,color:"#4ade80",marginTop:6}}>Résultat : {results[m.id].home}–{results[m.id].away}</div>}
+                    {!lk&&m.phase!=="Groupes"&&(()=>{
+                      const p=local[m.id]||{};
+                      const isNul=p.home!==undefined&&p.away!==undefined&&p.home!==""&&p.away!==""&&parseInt(p.home)===parseInt(p.away);
+                      if(!isNul)return null;
+                      return(
+                        <div style={{marginTop:10,background:"rgba(0,0,0,0.2)",borderRadius:8,padding:10}}>
+                          <div style={{fontSize:11,color:"#FFD700",fontWeight:700,marginBottom:8}}>🔄 Nul à 90 min — Qui gagne ensuite ?</div>
+                          <div style={{display:"flex",gap:6,marginBottom:8}}>
+                            {["prol","pen"].map(issue=>(
+                              <button key={issue} onClick={()=>set(m.id,"issue",p.issue===issue?null:issue)} style={{flex:1,padding:"6px 4px",borderRadius:7,border:`2px solid ${p.issue===issue?"#FFD700":"#B8962E44"}`,background:p.issue===issue?"#FFD700":"rgba(0,0,0,0.3)",color:p.issue===issue?"#000":"#fff",fontWeight:700,fontSize:12,cursor:"pointer"}}>
+                                {issue==="prol"?"⏱️ Prolongation":"🥅 Penalties"}
+                              </button>
+                            ))}
+                          </div>
+                          {p.issue&&(
+                            <div>
+                              <div style={{fontSize:11,color:"#d1fae5",marginBottom:6}}>Vainqueur :</div>
+                              <div style={{display:"flex",gap:6,marginBottom:p.issue==="prol"?8:0}}>
+                                {[m.home,m.away].map(team=>(
+                                  <button key={team} onClick={()=>set(m.id,"winner",p.winner===team?null:team)} style={{flex:1,padding:"6px 4px",borderRadius:7,border:`2px solid ${p.winner===team?"#4ade80":"#B8962E44"}`,background:p.winner===team?"#166534":"rgba(0,0,0,0.3)",color:"#fff",fontWeight:700,fontSize:11,cursor:"pointer"}}>
+                                    {p.winner===team?"✅ ":""}{team}
+                                  </button>
+                                ))}
+                              </div>
+                              {p.issue==="prol"&&(
+                                <div style={{marginTop:8}}>
+                                  <div style={{fontSize:11,color:"#d1fae5",marginBottom:6}}>Score après prolongation :</div>
+                                  <div style={{display:"flex",alignItems:"center",gap:6}}>
+                                    <span style={{flex:1,fontSize:11,color:"#fff",textAlign:"center"}}>{m.home}</span>
+                                    <input style={{background:"rgba(0,0,0,0.3)",border:"1px solid #B8962E",color:"#fff",width:38,height:32,textAlign:"center",borderRadius:6,fontSize:14,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="?" value={p.extraHome??""} onChange={e=>set(m.id,"extraHome",e.target.value)}/>
+                                    <span style={{color:"#FFD700",fontWeight:700}}>–</span>
+                                    <input style={{background:"rgba(0,0,0,0.3)",border:"1px solid #B8962E",color:"#fff",width:38,height:32,textAlign:"center",borderRadius:6,fontSize:14,fontWeight:900,outline:"none"}} type="number" min="0" max="20" placeholder="?" value={p.extraAway??""} onChange={e=>set(m.id,"extraAway",e.target.value)}/>
+                                    <span style={{flex:1,fontSize:11,color:"#fff",textAlign:"center"}}>{m.away}</span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               );
@@ -762,7 +897,7 @@ function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
             </div>
             {players.map(p=>{
               const pro=pronos[p]?.[m.id];
-              const pts=scoreProno(pro,res);
+              const pts=scoreProno(pro,res,m.phase!=="Groupes");
               return(
                 <div key={p} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0"}}>
                   <span style={{flex:1,fontSize:13,color:"#d1fae5"}}>{p}</span>
