@@ -72,24 +72,6 @@ const BASE_MATCHES = [
   {id:69,phase:"Groupes",group:"Groupe K",home:"Colombie",away:"Portugal",kickoff:"2026-06-27T23:30:00Z"},
   {id:70,phase:"Groupes",group:"Groupe K",home:"RD Congo",away:"Ouzbékistan",kickoff:"2026-06-27T23:30:00Z"},
   {id:71,phase:"Groupes",group:"Groupe J",home:"Algérie",away:"Autriche",kickoff:"2026-06-28T02:00:00Z"},
-  {id:73,phase:"Seizièmes",home:"Brésil",away:"Japon",kickoff:"2026-06-28T17:00:00Z"},
-  {id:74,phase:"Seizièmes",home:"Côte d'Ivoire",away:"Norvège",kickoff:"2026-06-28T22:00:00Z"},
-  {id:75,phase:"Seizièmes",home:"France",away:"Suède",kickoff:"2026-06-29T01:00:00Z"},
-  {id:76,phase:"Seizièmes",home:"Mexique",away:"Égypte",kickoff:"2026-06-29T00:00:00Z"},
-  {id:77,phase:"Seizièmes",home:"Allemagne",away:"Paraguay",kickoff:"2026-06-29T20:30:00Z"},
-  {id:78,phase:"Seizièmes",home:"Pays-Bas",away:"Maroc",kickoff:"2026-06-29T23:00:00Z"},
-  {id:79,phase:"Seizièmes",home:"Angleterre",away:"RD Congo",kickoff:"2026-06-30T16:00:00Z"},
-  {id:80,phase:"Seizièmes",home:"Belgique",away:"Sénégal",kickoff:"2026-06-30T20:00:00Z"},
-  {id:81,phase:"Seizièmes",home:"Espagne",away:"Cap-Vert",kickoff:"2026-06-30T21:00:00Z"},
-  {id:82,phase:"Seizièmes",home:"Uruguay",away:"Nouvelle-Zélande",kickoff:"2026-07-01T21:00:00Z"},
-  {id:83,phase:"Seizièmes",home:"Argentine",away:"Cap-Vert",kickoff:"2026-07-01T16:00:00Z"},
-  {id:84,phase:"Seizièmes",home:"Autriche",away:"Zambie",kickoff:"2026-07-01T20:00:00Z"},
-  {id:85,phase:"Seizièmes",home:"Portugal",away:"Ouzbekistan",kickoff:"2026-07-02T19:00:00Z"},
-  {id:86,phase:"Seizièmes",home:"Colombie",away:"Jamaïque",kickoff:"2026-07-02T23:00:00Z"},
-  {id:87,phase:"Seizièmes",home:"Croatie",away:"Ghana",kickoff:"2026-07-03T16:00:00Z"},
-  {id:88,phase:"Seizièmes",home:"Canada",away:"Afrique du Sud",kickoff:"2026-07-03T21:00:00Z"},
-  {id:89,phase:"Seizièmes",home:"USA",away:"Bosnie-Herzégovine",kickoff:"2026-07-04T19:00:00Z"},
-  {id:90,phase:"Seizièmes",home:"Pérou",away:"Qatar",kickoff:"2026-07-04T20:00:00Z"},
   {id:72,phase:"Groupes",group:"Groupe J",home:"Jordanie",away:"Argentine",kickoff:"2026-06-28T02:00:00Z"},
   {id:73,phase:"Seizièmes",home:"Canada",away:"Afrique du Sud",kickoff:"2026-06-28T22:00:00Z"},
   {id:74,phase:"Seizièmes",home:"Brésil",away:"Japon",kickoff:"2026-06-29T18:00:00Z"},
@@ -107,8 +89,8 @@ const BASE_MATCHES = [
   {id:86,phase:"Seizièmes",home:"Australie",away:"Égypte",kickoff:"2026-07-03T23:00:00Z"},
   {id:87,phase:"Seizièmes",home:"Argentine",away:"Cap-Vert",kickoff:"2026-07-03T02:00:00Z"},
   {id:88,phase:"Seizièmes",home:"Colombie",away:"Ghana",kickoff:"2026-07-03T02:30:00Z"},
-},
 ];
+
 
 const SORTED = [...BASE_MATCHES].sort((a,b)=>new Date(a.kickoff)-new Date(b.kickoff));
 const ADMIN_PASS = "cdm2026";
@@ -305,17 +287,16 @@ export default function App() {
 
   return(
     <div style={{...S.app,position:"relative",overflow:"hidden"}}>
-      {/* DIMA pattern sur toute l'app */}
       <div className="dima-pattern" style={{zIndex:1}}>
-              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
-              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
-              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
-              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
-              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
-              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
-              <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
-              <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
-            </div>
+        <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+        <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+        <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+        <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+        <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+        <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+        <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
+        <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
+      </div>
       <div style={{position:"relative",zIndex:2}}>
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
@@ -324,14 +305,6 @@ export default function App() {
         .dima-row .fr{color:rgba(255,60,60,0.16);}
         .dima-row .ar{color:rgba(74,222,128,0.16);}
         .dima-row .sep{color:rgba(255,215,0,0.15);}
-        @keyframes floatflag{
-          0%,100%{transform:translateY(-50%) rotate(3deg) scale(1);filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5)) brightness(1);}
-          25%{transform:translateY(-53%) rotate(1deg) scale(1.03);filter:drop-shadow(0 14px 35px rgba(0,0,0,0.4)) brightness(1.1);}
-          50%{transform:translateY(-48%) rotate(4deg) scale(0.98);filter:drop-shadow(0 8px 25px rgba(0,0,0,0.6)) brightness(1.05);}
-          75%{transform:translateY(-52%) rotate(2deg) scale(1.02);filter:drop-shadow(0 12px 32px rgba(0,0,0,0.45)) brightness(1.12);}
-        }
-        @keyframes maskglow{0%,100%{opacity:0.7;}50%{opacity:1;}}
-        @keyframes textglow{0%,100%{text-shadow:0 0 6px rgba(255,215,0,0.4);}50%{text-shadow:0 0 20px rgba(255,215,0,1),0 0 40px rgba(255,215,0,0.4);}}
         *{box-sizing:border-box}
         input[type=number]::-webkit-inner-spin-button{opacity:1}
       `}</style>
@@ -354,13 +327,10 @@ export default function App() {
 
       {screen==="home"&&(
         <div style={S.center}>
-          {/* HERO avec drapeau flottant + masque DIMA MAGHRIB */}
           <div style={{position:"relative",overflow:"hidden",background:"linear-gradient(160deg,#5a0000 0%,#A01020 30%,#6a0000 55%,#003010 80%,#001a08 100%)",borderRadius:16,marginBottom:20,display:"flex",flexDirection:"column",alignItems:"center",padding:"22px 20px 20px",gap:16}}>
-            {/* Drapeaux masque fond */}
             <div style={{position:"absolute",inset:0,zIndex:0,display:"grid",gridTemplateColumns:"1fr 1fr 1fr",overflow:"hidden",borderRadius:16}}>
               {["","",""].map((_,i)=><div key={i} style={{overflow:"hidden"}}><img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg" style={{width:"100%",height:"100%",objectFit:"cover",opacity:i===0?.28:i===1?.18:.14,filter:"saturate(0.6)",transform:i===1?"scaleX(-1)":"none"}} alt=""/></div>)}
             </div>
-            {/* DIMA pattern en biais */}
             <div className="dima-pattern">
               <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
               <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
@@ -369,24 +339,18 @@ export default function App() {
               <div className="dima-row"><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span></div>
               <div className="dima-row"><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span><span className="sep"> ✦ </span><span className="fr">DIMA MAGHRIB</span><span className="sep"> ✦ </span><span className="ar">ديما المغرب</span></div>
             </div>
-            {/* Overlay */}
             <div style={{position:"absolute",inset:0,zIndex:2,background:"linear-gradient(160deg,rgba(70,0,0,0.5),rgba(0,0,0,0.05),rgba(0,40,10,0.6))",borderRadius:16,pointerEvents:"none"}}/>
-            {/* Contenu */}
             <div style={{position:"relative",zIndex:4,display:"flex",flexDirection:"column",alignItems:"center",gap:14,padding:"4px 0"}}>
-              {/* Badge doré */}
               <div style={{background:"linear-gradient(135deg,#7a5a10,#B8962E,#FFD700,#B8962E,#7a5a10)",color:"#1a0a00",fontFamily:"'Bebas Neue',Impact,sans-serif",fontSize:13,letterSpacing:".16em",padding:"7px 24px",borderRadius:30,boxShadow:"0 4px 20px rgba(184,150,46,0.6),inset 0 1px 0 rgba(255,255,255,0.35)",textAlign:"center",whiteSpace:"nowrap"}}>⚽ PRONOS · COUPE DU MONDE 2026 ⚽</div>
-              {/* Drapeau statique, bien proportionné */}
               <div style={{position:"relative",width:160,height:107,borderRadius:6,overflow:"hidden",boxShadow:"0 8px 32px rgba(0,0,0,0.7),0 2px 8px rgba(0,0,0,0.5),0 0 0 2px rgba(255,215,0,0.3)"}}>
                 <img src="https://upload.wikimedia.org/wikipedia/commons/2/2c/Flag_of_Morocco.svg" style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}} alt="PRONOS CDM 2026"/>
                 <div style={{position:"absolute",inset:0,background:"linear-gradient(135deg,rgba(255,255,255,0.12) 0%,transparent 50%,rgba(0,0,0,0.15) 100%)",pointerEvents:"none"}}/>
               </div>
             </div>
           </div>
-          {/* Divider tricolore */}
           <div style={{height:5,background:"linear-gradient(90deg,#C1272D 0%,#B8962E 50%,#006233 100%)",borderRadius:3,marginBottom:20,position:"relative"}}>
             <span style={{position:"absolute",top:"50%",left:"50%",transform:"translate(-50%,-50%)",color:"#FFD700",fontSize:14,background:"#005c26",padding:"0 6px",lineHeight:1}}>★</span>
           </div>
-
           {!adminSetup?(
             <div style={S.card}>
               <h2 style={{fontSize:18,fontWeight:800,marginBottom:8}}>Bienvenue !</h2>
@@ -566,12 +530,9 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
   const set=(id,side,val)=>setLocal(l=>({...l,[id]:{...l[id],[side]:val}}));
   const locked=SORTED.filter(m=>isLocked(m.kickoff)).length;
   const open=SORTED.length-locked;
-
-  // Matchs du jour + lendemain (non verrouillés)
   const tk=todayKey();
   const tmKey=(()=>{const d=new Date();d.setDate(d.getDate()+1);const tm=new Date(d.toLocaleString("en-US",{timeZone:TZ}));return `${tm.getFullYear()}-${tm.getMonth()}-${tm.getDate()}`;})();
   const todayMatches=SORTED.filter(m=>(dayKey(m.kickoff)===tk||dayKey(m.kickoff)===tmKey)&&!isLocked(m.kickoff));
-
   return(
     <div>
       <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20,display:"flex",alignItems:"center",gap:14,marginBottom:14}}>
@@ -584,8 +545,6 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
           </div>
         </div>
       </div>
-
-      {/* SECTION MATCHS DU JOUR */}
       {todayMatches.length>0&&(
         <div style={{background:"linear-gradient(135deg,#7a0000,#C1272D)",border:"2px solid #FFD700",borderRadius:14,padding:16,marginBottom:16}}>
           <div style={{fontFamily:"Impact,sans-serif",fontSize:18,color:"#FFD700",letterSpacing:".1em",marginBottom:12}}>⚡ MATCHS DU JOUR & DEMAIN — À PRONO !</div>
@@ -607,13 +566,11 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
           <button style={{background:"linear-gradient(135deg,#B8962E,#8B6914)",color:"#000",border:"none",padding:"13px",borderRadius:10,fontSize:15,fontWeight:800,cursor:"pointer",width:"100%",marginTop:4}} onClick={()=>onSave(local)}>⚡ Valider mes pronos du jour !</button>
         </div>
       )}
-
       <div style={{display:"flex",gap:6,marginBottom:16}}>
         {[["my","📝 Mes pronos"],["all","👥 Tout le monde"]].map(([v,l])=>(
           <button key={v} style={{background:view===v?"#C1272D":"#006233",border:`1px solid ${view===v?"#C1272D":"#B8962E44"}`,color:"#fff",padding:"8px 16px",borderRadius:8,cursor:"pointer",fontSize:14,fontWeight:600}} onClick={()=>setView(v)}>{l}</button>
         ))}
       </div>
-
       {view==="my"&&(
         <>
           <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20,marginBottom:14}}>
@@ -705,8 +662,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
   const[local,setLocal]=useState(results);
   useEffect(()=>setLocal(results),[results]);
   const set=(id,side,val)=>setLocal(l=>({...l,[id]:{...l[id],[side]:val}}));
-  const PHASES=["Groupes","Tour de 32","8e de finale","Quart de finale","Demi-finale","3e place","Finale"];
-  // Ordre : matchs les plus récents en premier
+  const PHASES=["Groupes","Seizièmes","8e de finale","Quart de finale","Demi-finale","3e place","Finale"];
   const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase)].reverse();
   return(
     <div>
@@ -788,8 +744,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
 
 function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
   const PTS={5:"#B8962E",3:"#2563eb",2:"#7c3aed",1:"#d97706",0:"#dc2626"};
-  const PHASES=["Groupes","Tour de 32","8e de finale","Quart de finale","Demi-finale","Finale"];
-  // Ordre inversé : matchs les plus récents en premier
+  const PHASES=["Groupes","Seizièmes"];
   const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase&&results[m.id]?.home!==undefined)].reverse();
   return(
     <div style={{marginTop:32}}>
