@@ -867,6 +867,9 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
       )}
       {filtered.map(m=>{
         const done=local[m.id]?.home!==undefined&&local[m.id]?.home!=="";
+        const isKO=m.phase!=="Groupes";
+        const r=local[m.id]||{};
+        const isNul=r.home!==undefined&&r.home!==""&&r.away!==undefined&&r.away!==""&&parseInt(r.home)===parseInt(r.away);
         return(
           <div key={m.id} style={{background:done?"#004d1a":"#007a3d",border:`1px solid ${done?"#FFD700":"#B8962E44"}`,borderRadius:10,padding:"12px 14px",marginBottom:8}}>
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}>
@@ -876,11 +879,47 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8}}>
               <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.home}</span>
-              <input style={S.scoreInput} type="number" min="0" max="20" placeholder="–" value={local[m.id]?.home??""} onChange={e=>set(m.id,"home",e.target.value)}/>
+              <input style={S.scoreInput} type="number" min="0" max="20" placeholder="–" value={r.home??""} onChange={e=>set(m.id,"home",e.target.value)}/>
               <span style={{color:"#B8962E",fontWeight:700,fontSize:18}}>–</span>
-              <input style={S.scoreInput} type="number" min="0" max="20" placeholder="–" value={local[m.id]?.away??""} onChange={e=>set(m.id,"away",e.target.value)}/>
+              <input style={S.scoreInput} type="number" min="0" max="20" placeholder="–" value={r.away??""} onChange={e=>set(m.id,"away",e.target.value)}/>
               <span style={{flex:1,fontSize:13,fontWeight:600,color:"#fff",textAlign:"center"}}>{m.away}</span>
             </div>
+            {isKO&&isNul&&(
+              <div style={{marginTop:10,background:"rgba(0,0,0,0.2)",borderRadius:8,padding:10}}>
+                <div style={{fontSize:12,color:"#FFD700",fontWeight:700,marginBottom:8}}>🔄 Nul à 90 min — Issue du match ?</div>
+                <div style={{display:"flex",gap:6,marginBottom:8}}>
+                  {["prol","pen"].map(issue=>(
+                    <button key={issue} onClick={()=>setLocal(l=>({...l,[m.id]:{...l[m.id],issue:l[m.id]?.issue===issue?null:issue}}))} style={{flex:1,padding:"7px 4px",borderRadius:7,border:`2px solid ${r.issue===issue?"#FFD700":"#B8962E44"}`,background:r.issue===issue?"#FFD700":"rgba(0,0,0,0.3)",color:r.issue===issue?"#000":"#fff",fontWeight:700,fontSize:13,cursor:"pointer"}}>
+                      {issue==="prol"?"⏱️ Prolongation":"🥅 Penalties"}
+                    </button>
+                  ))}
+                </div>
+                {r.issue&&(
+                  <div>
+                    <div style={{fontSize:12,color:"#d1fae5",marginBottom:6}}>Vainqueur final :</div>
+                    <div style={{display:"flex",gap:6,marginBottom:r.issue==="prol"?8:0}}>
+                      {[m.home,m.away].map(team=>(
+                        <button key={team} onClick={()=>setLocal(l=>({...l,[m.id]:{...l[m.id],winner:l[m.id]?.winner===team?null:team}}))} style={{flex:1,padding:"7px 4px",borderRadius:7,border:`2px solid ${r.winner===team?"#4ade80":"#B8962E44"}`,background:r.winner===team?"#166534":"rgba(0,0,0,0.3)",color:"#fff",fontWeight:700,fontSize:12,cursor:"pointer"}}>
+                          {r.winner===team?"✅ ":""}{team}
+                        </button>
+                      ))}
+                    </div>
+                    {r.issue==="prol"&&(
+                      <div style={{marginTop:8}}>
+                        <div style={{fontSize:12,color:"#d1fae5",marginBottom:6}}>Score après prolongation :</div>
+                        <div style={{display:"flex",alignItems:"center",gap:8}}>
+                          <span style={{flex:1,fontSize:12,color:"#fff",textAlign:"center"}}>{m.home}</span>
+                          <input style={{...S.scoreInput,border:"2px solid #B8962E"}} type="number" min="0" max="20" placeholder="?" value={r.extraHome??""} onChange={e=>setLocal(l=>({...l,[m.id]:{...l[m.id],extraHome:e.target.value}}))}/>
+                          <span style={{color:"#FFD700",fontWeight:700,fontSize:18}}>–</span>
+                          <input style={{...S.scoreInput,border:"2px solid #B8962E"}} type="number" min="0" max="20" placeholder="?" value={r.extraAway??""} onChange={e=>setLocal(l=>({...l,[m.id]:{...l[m.id],extraAway:e.target.value}}))}/>
+                          <span style={{flex:1,fontSize:12,color:"#fff",textAlign:"center"}}>{m.away}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         );
       })}
