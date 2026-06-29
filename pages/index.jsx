@@ -774,11 +774,12 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
                           let proLabel="—";
                           if(pro&&pro.home!==undefined&&pro.home!==""){
                             proLabel=`${pro.home}–${pro.away}`;
-                            if(pro.issue==="prol"){
+                            const isNulPro=parseInt(pro.home)===parseInt(pro.away);
+                            if(isNulPro&&pro.issue==="prol"){
                               proLabel+=` ⏱️`;
                               if(pro.winner)proLabel+=` ${pro.winner}`;
                               if(pro.extraHome!==undefined&&pro.extraHome!=="")proLabel+=` (${pro.extraHome}–${pro.extraAway})`;
-                            } else if(pro.issue==="pen"){
+                            } else if(isNulPro&&pro.issue==="pen"){
                               proLabel+=` 🥅 ${pro.winner||""}`;
                             }
                           }
