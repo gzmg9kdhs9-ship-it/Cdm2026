@@ -771,10 +771,21 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
                       <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
                         {players.map(p=>{
                           const pro=allPronos[p]?.[m.id];
+                          let proLabel="—";
+                          if(pro&&pro.home!==undefined&&pro.home!==""){
+                            proLabel=`${pro.home}–${pro.away}`;
+                            if(pro.issue==="prol"){
+                              proLabel+=` ⏱️`;
+                              if(pro.winner)proLabel+=` ${pro.winner}`;
+                              if(pro.extraHome!==undefined&&pro.extraHome!=="")proLabel+=` (${pro.extraHome}–${pro.extraAway})`;
+                            } else if(pro.issue==="pen"){
+                              proLabel+=` 🥅 ${pro.winner||""}`;
+                            }
+                          }
                           return(
                             <div key={p} style={{background:"#005c26",border:"1px solid #B8962E44",borderRadius:8,padding:"5px 10px",flex:"1 1 80px",textAlign:"center"}}>
                               <div style={{fontSize:10,color:"#FFD700",marginBottom:2}}>{p}</div>
-                              <div style={{fontSize:15,fontWeight:800,color:pro?"#fff":"#374151"}}>{pro?`${pro.home}–${pro.away}`:"—"}</div>
+                              <div style={{fontSize:13,fontWeight:800,color:pro?"#fff":"#374151",lineHeight:1.3}}>{proLabel}</div>
                             </div>
                           );
                         })}
