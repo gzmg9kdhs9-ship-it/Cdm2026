@@ -981,10 +981,19 @@ function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
         const res=results[m.id];
         return(
           <div key={m.id} style={{...S.card,marginBottom:8}}>
-            <div style={{display:"flex",justifyContent:"space-between",fontWeight:700,marginBottom:10,fontSize:14}}>
+            <div style={{display:"flex",justifyContent:"space-between",fontWeight:700,marginBottom:4,fontSize:14}}>
               <span style={{color:"#fff"}}>{m.home} {res.home}–{res.away} {m.away}</span>
               <span style={{color:"#FFD700",fontSize:12}}>{m.group||m.phase}</span>
             </div>
+            {res.issue&&(
+              <div style={{fontSize:12,color:"#4ade80",marginBottom:8}}>
+                {res.issue==="prol"?`⏱️ Prolongation`:`🥅 Penalties`} — Vainqueur : <strong>{res.winner||"—"}</strong>
+                {res.issue==="prol"&&res.extraHome!==undefined&&res.extraHome!==""&&` (${res.extraHome}–${res.extraAway})`}
+              </div>
+            )}
+            {!res.issue&&res.home===res.away&&(
+              <div style={{fontSize:12,color:"#f87171",marginBottom:8}}>⚠️ Issue du nul non précisée</div>
+            )}
             {players.map(p=>{
               const pro=pronos[p]?.[m.id];
               const pts=scoreProno(pro,res,m.phase!=="Groupes");
