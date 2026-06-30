@@ -102,7 +102,7 @@ function fmtHour(iso){return new Date(iso).toLocaleTimeString("fr-FR",{timeZone:
 function dayKey(iso){const d=new Date(new Date(iso).toLocaleString("en-US",{timeZone:TZ}));return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
 function todayKey(){const d=new Date(new Date().toLocaleString("en-US",{timeZone:TZ}));return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
 
-function scoreProno(p,r,isKnockout){
+function scoreProno(p,r,isKnockout,homeTeam,awayTeam){
   if(!p||!r)return null;
   const ph=parseInt(p.home),pa=parseInt(p.away),rh=parseInt(r.home),ra=parseInt(r.away);
   if(isNaN(ph)||isNaN(pa)||isNaN(rh)||isNaN(ra))return null;
@@ -119,46 +119,49 @@ function scoreProno(p,r,isKnockout){
   const realNul=(rh===ra);
   const pronoNul=(ph===pa);
 
-  // Score exact à 90 min (victoire)
-  if(!realNul&&ph===rh&&pa===ra)return 10;
-
   if(realNul){
-    const pronoWinner=p.winner||null;
     const realWinner=r.winner||null;
     const realIssue=r.issue||null;
-    const goodWinner=pronoWinner&&realWinner&&pronoWinner===realWinner;
-    if(pronoNul){
-      // Nul exact à 90 min
-      if(goodWinner){
-        if(realIssue==="prol"){
-          const prh=parseInt(p.extraHome),pra=parseInt(p.extraAway),rrh=parseInt(r.extraHome),rra=parseInt(r.extraAway);
-          if(!isNaN(prh)&&!isNaN(pra)&&prh===rrh&&pra===rra)return 10;
-          return 7;
-        }
-        if(realIssue==="pen")return 10;
-      }
-      return 3; // nul exact + mauvais vainqueur
-    }
-    // Nul approx
-    if(goodWinner)return 4;
-    return 2; // nul approx + mauvais vainqueur
-  }
+    const pronoWinner=p.winner||null;
 
-  // Victoire prédite à 90 min mais match nul en réalité → prolongation ou penalty
-  const pw=ph>pa?"H":ph<pa?"A":"D";
-  if(realNul){
-    const realWinner=r.winner||null;
-    const pronoWinner=pw==="H"?m_home:m_away; // on déduit le vainqueur prédit du score
-    // On ne peut pas comparer sans connaître m.home/m.away ici
-    // On utilise p.predictedWinner si dispo, sinon on compare avec r.winner
+    if(pronoNul){
+      const exactNul=(ph===rh&&pa===ra);
+      const goodWinner=pronoWinner&&realWinner&&pronoWinner===realWinner;
+      if(exactNul){
+        const pronoIssue=p.issue||null;
+        if(goodWinner&&pronoIssue===realIssue){
+          if(realIssue==="prol"){
+            const prh=parseInt(p.extraHome),pra=parseInt(p.extraAway),rrh=parseInt(r.extraHome),rra=parseInt(r.extraAway);
+            if(!isNaN(prh)&&!isNaN(pra)&&prh===rrh&&pra===rra)return 10;
+            return 7;
+          }
+          if(realIssue==="pen")return 10;
+        }
+        if(goodWinner)return 6; // bon vainqueur mais mauvaise issue prédite (prol au lieu de pen ou inversement)
+        return 3; // nul exact + mauvais vainqueur (ou pas de vainqueur précisé)
+      }
+      // Nul approximatif (score nul différent du score réel, ex: 2-2 au lieu de 1-1)
+      if(goodWinner)return 4;
+      return 2; // nul approx + mauvais vainqueur
+    }
+
+    // Le joueur avait prédit une victoire (pas un nul), mais le match est allé en prolongation/penalty
     const predW=ph>pa?"home":"away";
-    const realW=r.winner||null;
-    // Le vainqueur prédit = l'équipe qui gagne selon le score prédit
-    const goodWinner=realW&&((predW==="home"&&realW==="home")||(predW==="away"&&realW==="away"));
-    if(goodWinner&&r.issue==="prol")return 3;
-    if(goodWinner&&r.issue==="pen")return 2;
+    const realWSide=r.winnerSide||null; // "home" ou "away" si disponible
+    let goodWinner=false;
+    if(realWinner){
+      // On compare le nom de l'équipe gagnante réelle avec le côté prédit
+      goodWinner=(predW==="home"&&realWinner===homeTeam)||(predW==="away"&&realWinner===awayTeam);
+    }
+    if(goodWinner&&realIssue==="prol")return 3;
+    if(goodWinner&&realIssue==="pen")return 2;
     return 0;
   }
+
+  // Score exact à 90 min (victoire nette, pas de nul)
+  if(ph===rh&&pa===ra)return 10;
+
+  const pw=ph>pa?"H":ph<pa?"A":"D";
   const rw=rh>ra?"H":rh<ra?"A":"D",ok=pw===rw;
   if(!ok)return 0;
   if(ph===rh||pa===ra)return 7;
@@ -172,7 +175,7 @@ function computeStandings(players,pronos,results){
     let total=0,exact=0,winners=0,consec=0,maxC=0;
     const filled=BASE_MATCHES.filter(m=>isLocked(m.kickoff)&&pronos[name]?.[m.id]?.home!==undefined&&pronos[name][m.id].home!=="").length;
     BASE_MATCHES.forEach(m=>{
-      const pts=scoreProno(pronos[name]?.[m.id],results[m.id],m.phase!=="Groupes");
+      const pts=scoreProno(pronos[name]?.[m.id],results[m.id],m.phase!=="Groupes",m.home,m.away);
       if(pts!==null){total+=pts;if(pts===5)exact++;if(pts>=2){winners++;consec++;maxC=Math.max(maxC,consec);}else consec=0;}
       else consec=0;
     });
@@ -996,7 +999,7 @@ function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
             )}
             {players.map(p=>{
               const pro=pronos[p]?.[m.id];
-              const pts=scoreProno(pro,res,m.phase!=="Groupes");
+              const pts=scoreProno(pro,res,m.phase!=="Groupes",m.home,m.away);
               let proLabel="—";
               if(pro&&pro.home!==undefined&&pro.home!==""){
                 proLabel=`${pro.home}–${pro.away}`;
