@@ -968,7 +968,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
 }
 
 function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
-  const PTS={5:"#B8962E",3:"#2563eb",2:"#7c3aed",1:"#d97706",0:"#dc2626"};
+  const PTS={10:"#B8962E",7:"#2563eb",6:"#0891b2",5:"#7c3aed",4:"#0d9488",3:"#d97706",2:"#ea580c",1:"#dc2626",0:"#7f1d1d"};
   const PHASES=["Groupes","Seizièmes"];
   const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase&&results[m.id]?.home!==undefined)].reverse();
   return(
@@ -997,11 +997,24 @@ function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
             {players.map(p=>{
               const pro=pronos[p]?.[m.id];
               const pts=scoreProno(pro,res,m.phase!=="Groupes");
+              let proLabel="—";
+              if(pro&&pro.home!==undefined&&pro.home!==""){
+                proLabel=`${pro.home}–${pro.away}`;
+                const isNulPro=parseInt(pro.home)===parseInt(pro.away);
+                if(isNulPro&&pro.issue==="prol"){
+                  proLabel+=` ⏱️${pro.winner?` ${pro.winner}`:" (pas de vainqueur)"}`;
+                  if(pro.extraHome!==undefined&&pro.extraHome!=="")proLabel+=` (${pro.extraHome}–${pro.extraAway})`;
+                } else if(isNulPro&&pro.issue==="pen"){
+                  proLabel+=` 🥅${pro.winner?` ${pro.winner}`:" (pas de vainqueur)"}`;
+                } else if(isNulPro){
+                  proLabel+=` (pas d'issue précisée)`;
+                }
+              }
               return(
                 <div key={p} style={{display:"flex",alignItems:"center",gap:8,padding:"4px 0"}}>
                   <span style={{flex:1,fontSize:13,color:"#d1fae5"}}>{p}</span>
-                  <span style={{fontSize:13,fontWeight:700,minWidth:40,textAlign:"center",color:"#fff"}}>{pro?`${pro.home}–${pro.away}`:"—"}</span>
-                  <span style={{fontSize:12,fontWeight:700,color:"#fff",padding:"2px 8px",borderRadius:10,minWidth:40,textAlign:"center",background:pts!==null?PTS[pts]:"#374151"}}>{pts!==null?`${pts} pt${pts>1?"s":""}`:"—"}</span>
+                  <span style={{fontSize:12,fontWeight:700,minWidth:90,textAlign:"center",color:"#fff"}}>{proLabel}</span>
+                  <span style={{fontSize:12,fontWeight:700,color:"#fff",padding:"2px 8px",borderRadius:10,minWidth:40,textAlign:"center",background:pts!==null?(PTS[pts]||"#16a34a"):"#374151"}}>{pts!==null?`${pts} pt${pts>1?"s":""}`:"—"}</span>
                 </div>
               );
             })}
