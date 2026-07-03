@@ -163,6 +163,16 @@ function scoreProno(p,r,isKnockout,homeTeam,awayTeam){
 
   const pw=ph>pa?"H":ph<pa?"A":"D";
   const rw=rh>ra?"H":rh<ra?"A":"D",ok=pw===rw;
+
+  // Joueur a prédit un nul mais match terminé en victoire directe
+  if(pronoNul){
+    // Vérifier si le vainqueur prédit correspond au vainqueur réel
+    const pronoWinner=p.winner||null;
+    const realWinner=rw==="H"?homeTeam:awayTeam;
+    if(pronoWinner&&pronoWinner===realWinner)return 5;
+    return 0;
+  }
+
   if(!ok)return 0;
   if(ph===rh||pa===ra)return 7;
   const sameDiff=Math.abs(ph-pa)===Math.abs(rh-ra);
