@@ -153,8 +153,8 @@ function scoreProno(p,r,isKnockout,homeTeam,awayTeam){
       // On compare le nom de l'équipe gagnante réelle avec le côté prédit
       goodWinner=(predW==="home"&&realWinner===homeTeam)||(predW==="away"&&realWinner===awayTeam);
     }
-    if(goodWinner&&realIssue==="prol")return 3;
-    if(goodWinner&&realIssue==="pen")return 2;
+    if(goodWinner&&realIssue==="prol")return 5;
+    if(goodWinner&&realIssue==="pen")return 5;
     return 0;
   }
 
