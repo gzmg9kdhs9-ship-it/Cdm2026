@@ -89,6 +89,14 @@ const BASE_MATCHES = [
   {id:86,phase:"Seizièmes",home:"Australie",away:"Égypte",kickoff:"2026-07-03T18:00:00Z"},
   {id:87,phase:"Seizièmes",home:"Argentine",away:"Cap-Vert",kickoff:"2026-07-03T22:00:00Z"},
   {id:88,phase:"Seizièmes",home:"Colombie",away:"Ghana",kickoff:"2026-07-04T01:30:00Z"},
+  {id:89,phase:"Huitièmes",home:"Canada",away:"Maroc",kickoff:"2026-07-04T17:00:00Z"},
+  {id:90,phase:"Huitièmes",home:"Paraguay",away:"France",kickoff:"2026-07-04T21:00:00Z"},
+  {id:91,phase:"Huitièmes",home:"Brésil",away:"Norvège",kickoff:"2026-07-05T20:00:00Z"},
+  {id:92,phase:"Huitièmes",home:"Mexique",away:"Angleterre",kickoff:"2026-07-06T00:00:00Z"},
+  {id:93,phase:"Huitièmes",home:"Portugal",away:"Espagne",kickoff:"2026-07-06T19:00:00Z"},
+  {id:94,phase:"Huitièmes",home:"États-Unis",away:"Belgique",kickoff:"2026-07-07T00:00:00Z"},
+  {id:95,phase:"Huitièmes",home:"Argentine",away:"Égypte",kickoff:"2026-07-07T16:00:00Z"},
+  {id:96,phase:"Huitièmes",home:"Suisse",away:"Colombie",kickoff:"2026-07-07T20:00:00Z"},
 ];
 
 
@@ -822,7 +830,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
   const[local,setLocal]=useState(results);
   useEffect(()=>setLocal(results),[results]);
   const set=(id,side,val)=>setLocal(l=>({...l,[id]:{...l[id],[side]:val}}));
-  const PHASES=["Groupes","Seizièmes","8e de finale","Quart de finale","Demi-finale","3e place","Finale"];
+  const PHASES=["Groupes","Seizièmes","Huitièmes","Quart de finale","Demi-finale","3e place","Finale"];
   const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase)].reverse();
   return(
     <div>
@@ -982,7 +990,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
 
 function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
   const PTS={10:"#B8962E",7:"#2563eb",6:"#0891b2",5:"#7c3aed",4:"#0d9488",3:"#d97706",2:"#ea580c",1:"#dc2626",0:"#7f1d1d"};
-  const PHASES=["Groupes","Seizièmes"];
+  const PHASES=["Groupes","Seizièmes","Huitièmes"];
   const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase&&results[m.id]?.home!==undefined)].reverse();
   return(
     <div style={{marginTop:32}}>
