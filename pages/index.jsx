@@ -97,6 +97,10 @@ const BASE_MATCHES = [
   {id:94,phase:"Huitièmes",home:"États-Unis",away:"Belgique",kickoff:"2026-07-07T00:00:00Z"},
   {id:95,phase:"Huitièmes",home:"Argentine",away:"Égypte",kickoff:"2026-07-07T16:00:00Z"},
   {id:96,phase:"Huitièmes",home:"Suisse",away:"Colombie",kickoff:"2026-07-07T20:00:00Z"},
+  {id:97,phase:"Quarts",home:"France",away:"Maroc",kickoff:"2026-07-09T20:00:00Z"},
+  {id:98,phase:"Quarts",home:"Espagne",away:"Belgique",kickoff:"2026-07-10T19:00:00Z"},
+  {id:99,phase:"Quarts",home:"Norvège",away:"Angleterre",kickoff:"2026-07-11T21:00:00Z"},
+  {id:100,phase:"Quarts",home:"Argentine",away:"Suisse",kickoff:"2026-07-12T01:00:00Z"},
 ];
 
 
@@ -848,7 +852,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
       {(()=>{
         const tk=todayKey();
         const tmKey=(()=>{const d=new Date();d.setDate(d.getDate()+1);const tm=new Date(d.toLocaleString("en-US",{timeZone:TZ}));return `${tm.getFullYear()}-${tm.getMonth()}-${tm.getDate()}`;})();
-        const upcomingMatches=BASE_MATCHES.filter(m=>m.phase===filterPhase&&(dayKey(m.kickoff)===tk||dayKey(m.kickoff)===tmKey)).sort((a,b)=>new Date(a.kickoff)-new Date(b.kickoff));
+        const upcomingMatches=BASE_MATCHES.filter(m=>(dayKey(m.kickoff)===tk||dayKey(m.kickoff)===tmKey)&&m.phase!=="Groupes").sort((a,b)=>new Date(a.kickoff)-new Date(b.kickoff));
         if(upcomingMatches.length===0)return null;
         return(
           <div style={{background:"linear-gradient(135deg,#7a0000,#C1272D)",border:"2px solid #FFD700",borderRadius:14,padding:16,marginBottom:20}}>
