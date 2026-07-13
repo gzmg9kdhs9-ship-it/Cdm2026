@@ -101,6 +101,8 @@ const BASE_MATCHES = [
   {id:98,phase:"Quarts",home:"Espagne",away:"Belgique",kickoff:"2026-07-10T19:00:00Z"},
   {id:99,phase:"Quarts",home:"Norvège",away:"Angleterre",kickoff:"2026-07-11T21:00:00Z"},
   {id:100,phase:"Quarts",home:"Argentine",away:"Suisse",kickoff:"2026-07-12T01:00:00Z"},
+  {id:101,phase:"Demis",home:"France",away:"Espagne",kickoff:"2026-07-14T19:00:00Z"},
+  {id:102,phase:"Demis",home:"Argentine",away:"Angleterre",kickoff:"2026-07-15T19:00:00Z"},
 ];
 
 
@@ -289,7 +291,7 @@ export default function App() {
   const [adminMode,setAdminMode]=useState(false);
   const [adminPass,setAdminPass]=useState("");
   const [showAdminInput,setShowAdminInput]=useState(false);
-  const [filterPhase,setFilterPhase]=useState("Groupes");
+  const [filterPhase,setFilterPhase]=useState("Quarts");
   const [fetchingScores,setFetchingScores]=useState(false);
   const [scoresLog,setScoresLog]=useState(null);
   const [toast,setToast]=useState(null);
@@ -834,7 +836,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
   const[local,setLocal]=useState(results);
   useEffect(()=>setLocal(results),[results]);
   const set=(id,side,val)=>setLocal(l=>({...l,[id]:{...l[id],[side]:val}}));
-  const PHASES=["Groupes","Seizièmes","Huitièmes","Quart de finale","Demi-finale","3e place","Finale"];
+  const PHASES=["Groupes","Seizièmes","Huitièmes","Quarts","Demis","3e place","Finale"];
   const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase)].reverse();
   return(
     <div>
@@ -994,7 +996,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
 
 function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
   const PTS={10:"#B8962E",7:"#2563eb",6:"#0891b2",5:"#7c3aed",4:"#0d9488",3:"#d97706",2:"#ea580c",1:"#dc2626",0:"#7f1d1d"};
-  const PHASES=["Groupes","Seizièmes","Huitièmes"];
+  const PHASES=["Groupes","Seizièmes","Huitièmes","Quarts","Demis"];
   const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase&&results[m.id]?.home!==undefined)].reverse();
   return(
     <div style={{marginTop:32}}>
