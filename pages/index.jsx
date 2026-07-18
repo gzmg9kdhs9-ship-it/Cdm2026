@@ -103,6 +103,8 @@ const BASE_MATCHES = [
   {id:100,phase:"Quarts",home:"Argentine",away:"Suisse",kickoff:"2026-07-12T01:00:00Z"},
   {id:101,phase:"Demis",home:"France",away:"Espagne",kickoff:"2026-07-14T19:00:00Z"},
   {id:102,phase:"Demis",home:"Argentine",away:"Angleterre",kickoff:"2026-07-15T19:00:00Z"},
+  {id:103,phase:"3e place",home:"France",away:"Angleterre",kickoff:"2026-07-17T21:00:00Z"},
+  {id:104,phase:"Finale",home:"Espagne",away:"Argentine",kickoff:"2026-07-18T19:00:00Z"},
 ];
 
 
@@ -291,7 +293,7 @@ export default function App() {
   const [adminMode,setAdminMode]=useState(false);
   const [adminPass,setAdminPass]=useState("");
   const [showAdminInput,setShowAdminInput]=useState(false);
-  const [filterPhase,setFilterPhase]=useState("Quarts");
+  const [filterPhase,setFilterPhase]=useState("3e place");
   const [fetchingScores,setFetchingScores]=useState(false);
   const [scoresLog,setScoresLog]=useState(null);
   const [toast,setToast]=useState(null);
@@ -996,7 +998,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
 
 function ScoreDetails({players,pronos,results,filterPhase,setFilterPhase}){
   const PTS={10:"#B8962E",7:"#2563eb",6:"#0891b2",5:"#7c3aed",4:"#0d9488",3:"#d97706",2:"#ea580c",1:"#dc2626",0:"#7f1d1d"};
-  const PHASES=["Groupes","Seizièmes","Huitièmes","Quarts","Demis"];
+  const PHASES=["Groupes","Seizièmes","Huitièmes","Quarts","Demis","3e place","Finale"];
   const filtered=[...BASE_MATCHES.filter(m=>m.phase===filterPhase&&results[m.id]?.home!==undefined)].reverse();
   return(
     <div style={{marginTop:32}}>
