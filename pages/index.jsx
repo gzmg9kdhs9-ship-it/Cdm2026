@@ -115,8 +115,8 @@ const TZ = "Africa/Casablanca";
 function isLocked(iso){return Date.now()>=new Date(iso).getTime();}
 function fmtDay(iso){return new Date(iso).toLocaleDateString("fr-FR",{timeZone:TZ,weekday:"long",day:"numeric",month:"long",year:"numeric"});}
 function fmtHour(iso){return new Date(iso).toLocaleTimeString("fr-FR",{timeZone:TZ,hour:"2-digit",minute:"2-digit"});}
-function dayKey(iso){const d=new Date(new Date(iso).toLocaleString("en-US",{timeZone:TZ}));return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
-function todayKey(){const d=new Date(new Date().toLocaleString("en-US",{timeZone:TZ}));return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;}
+function dayKey(iso){const d=new Date(new Date(iso).getTime()+3600000);return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;}
+function todayKey(){const d=new Date(Date.now()+3600000);return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;}
 
 function scoreProno(p,r,isKnockout,homeTeam,awayTeam){
   if(!p||!r)return null;
@@ -613,8 +613,8 @@ function PronoForm({player,pronos,allPronos,players,results,onSave}){
   const locked=SORTED.filter(m=>isLocked(m.kickoff)).length;
   const open=SORTED.length-locked;
   const tk=todayKey();
-  const tmKey=(()=>{const d=new Date();d.setDate(d.getDate()+1);const tm=new Date(d.toLocaleString("en-US",{timeZone:TZ}));return `${tm.getFullYear()}-${tm.getMonth()}-${tm.getDate()}`;})();
-  const todayMatches=SORTED.filter(m=>(dayKey(m.kickoff)===tk||dayKey(m.kickoff)===tmKey)&&!isLocked(m.kickoff));
+  const tmKey=(()=>{const d=new Date(Date.now()+3600000+86400000);return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;})();
+  const todayMatches=SORTED.filter(m=>(dayKey(m.kickoff)===tk||dayKey(m.kickoff)===tmKey));
   return(
     <div>
       <div style={{background:"#007a3d",border:"1px solid #B8962E44",borderRadius:12,padding:20,display:"flex",alignItems:"center",gap:14,marginBottom:14}}>
@@ -855,7 +855,7 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
       </div>
       {(()=>{
         const tk=todayKey();
-        const tmKey=(()=>{const d=new Date();d.setDate(d.getDate()+1);const tm=new Date(d.toLocaleString("en-US",{timeZone:TZ}));return `${tm.getFullYear()}-${tm.getMonth()}-${tm.getDate()}`;})();
+        const tmKey=(()=>{const d=new Date(Date.now()+3600000+86400000);return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;})();
         const upcomingMatches=BASE_MATCHES.filter(m=>(dayKey(m.kickoff)===tk||dayKey(m.kickoff)===tmKey)&&m.phase!=="Groupes").sort((a,b)=>new Date(a.kickoff)-new Date(b.kickoff));
         if(upcomingMatches.length===0)return null;
         return(
