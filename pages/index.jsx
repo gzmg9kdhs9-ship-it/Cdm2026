@@ -103,8 +103,8 @@ const BASE_MATCHES = [
   {id:100,phase:"Quarts",home:"Argentine",away:"Suisse",kickoff:"2026-07-12T01:00:00Z"},
   {id:101,phase:"Demis",home:"France",away:"Espagne",kickoff:"2026-07-14T19:00:00Z"},
   {id:102,phase:"Demis",home:"Argentine",away:"Angleterre",kickoff:"2026-07-15T19:00:00Z"},
-  {id:103,phase:"3e place",home:"France",away:"Angleterre",kickoff:"2026-07-17T21:00:00Z"},
-  {id:104,phase:"Finale",home:"Espagne",away:"Argentine",kickoff:"2026-07-18T19:00:00Z"},
+  {id:103,phase:"3e place",home:"France",away:"Angleterre",kickoff:"2026-07-18T21:00:00Z"},
+  {id:104,phase:"Finale",home:"Espagne",away:"Argentine",kickoff:"2026-07-19T19:00:00Z"},
 ];
 
 
