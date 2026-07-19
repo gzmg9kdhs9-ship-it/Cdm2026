@@ -103,7 +103,7 @@ const BASE_MATCHES = [
   {id:100,phase:"Quarts",home:"Argentine",away:"Suisse",kickoff:"2026-07-12T01:00:00Z"},
   {id:101,phase:"Demis",home:"France",away:"Espagne",kickoff:"2026-07-14T19:00:00Z"},
   {id:102,phase:"Demis",home:"Argentine",away:"Angleterre",kickoff:"2026-07-15T19:00:00Z"},
-  {id:103,phase:"3e place",home:"France",away:"Angleterre",kickoff:"2026-07-18T21:00:00Z"},
+  {id:103,phase:"3e place",home:"France",away:"Angleterre",kickoff:"2026-07-18T22:00:00Z"},
   {id:104,phase:"Finale",home:"Espagne",away:"Argentine",kickoff:"2026-07-19T19:00:00Z"},
 ];
 
@@ -207,7 +207,7 @@ function computeStandings(players,pronos,results){
     });
     const cb=Math.floor(maxC/5)*3;
     const champ=pronos[name]?.champion&&results.champion&&pronos[name].champion===results.champion?10:0;
-    return{name,total:total+cb+champ,exact,winners,cb,champ,filled};
+    return{name,total:total+cb+champ,exact,winners,cb,champ,filled,predictedChamp:pronos[name]?.champion||null};
   }).sort((a,b)=>b.total-a.total||b.exact-a.exact||b.winners-a.winners);
 }
 
@@ -557,8 +557,8 @@ export default function App() {
               </div>
               {(s.cb>0||s.champ>0)&&(
                 <div style={{display:"flex",gap:6,marginTop:6,flexWrap:"wrap"}}>
-                  {s.cb>0&&<span style={S.bonus}>+{s.cb} Carré</span>}
-                  {s.champ>0&&<span style={S.bonus}>+{s.champ} 🏆</span>}
+                  {s.cb>0&&<span style={S.bonus}>🔥 +{s.cb} Série</span>}
+                  {s.champ>0&&<span style={{...S.bonus,background:"linear-gradient(135deg,#7a5a10,#FFD700)",color:"#000"}}>🌟 +{s.champ} Champion prédit !</span>}
                 </div>
               )}
             </div>
