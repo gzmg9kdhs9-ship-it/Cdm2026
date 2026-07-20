@@ -202,10 +202,15 @@ function computeStandings(players,pronos,results){
     const filled=BASE_MATCHES.filter(m=>isLocked(m.kickoff)&&pronos[name]?.[m.id]?.home!==undefined&&pronos[name][m.id].home!=="").length;
     BASE_MATCHES.forEach(m=>{
       const pts=scoreProno(pronos[name]?.[m.id],results[m.id],m.phase!=="Groupes",m.home,m.away);
-      if(pts!==null){total+=pts;if(pts===5)exact++;if(pts>=2){winners++;consec++;maxC=Math.max(maxC,consec);}else consec=0;}
-      else consec=0;
+      const isKO=m.phase!=="Groupes";
+      if(pts!==null){
+        total+=pts;
+        if(isKO?pts===10:pts===5)exact++;
+        if(pts>=2){winners++;consec++;maxC=Math.max(maxC,consec);}
+        else consec=0;
+      } else consec=0;
     });
-    const cb=Math.floor(maxC/5)*3;
+    const cb=Math.floor(maxC/5)*6;
     const champ=pronos[name]?.champion&&results.champion&&pronos[name].champion===results.champion?10:0;
     return{name,total:total+cb+champ,exact,winners,cb,champ,filled,predictedChamp:pronos[name]?.champion||null};
   }).sort((a,b)=>b.total-a.total||b.exact-a.exact||b.winners-a.winners);
