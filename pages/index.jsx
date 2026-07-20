@@ -932,10 +932,12 @@ function ResultsForm({results,filterPhase,setFilterPhase,onSave,onFetchScores,fe
       <div style={{display:"flex",gap:4,flexWrap:"wrap",marginBottom:16}}>
         {PHASES.map(ph=><button key={ph} style={{...S.phaseBtn,...(filterPhase===ph?S.phaseBtnOn:{})}} onClick={()=>setFilterPhase(ph)}>{ph}</button>)}
       </div>
-      <div style={{...S.card,marginBottom:14}}>
-        <label style={{fontSize:13,color:"#FFD700",display:"block",marginBottom:8}}>🏆 Champion officiel (+10 pts)</label>
-        <input style={{background:"#005c26",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"8px 12px",borderRadius:8,fontSize:15,outline:"none",width:"100%"}} placeholder="Équipe championne" value={local.champion||""} onChange={e=>setLocal(l=>({...l,champion:e.target.value}))}/>
-      </div>
+      {filterPhase==="Groupes"&&(
+        <div style={{...S.card,marginBottom:14}}>
+          <label style={{fontSize:13,color:"#FFD700",display:"block",marginBottom:8}}>🏆 Champion officiel</label>
+          <input style={{background:"#005c26",border:"1px solid #B8962E44",color:"#f1f5f9",padding:"8px 12px",borderRadius:8,fontSize:15,outline:"none",width:"100%"}} placeholder="Équipe championne" value={local.champion||""} onChange={e=>setLocal(l=>({...l,champion:e.target.value}))}/>
+        </div>
+      )}
       {filtered.map(m=>{
         const done=local[m.id]?.home!==undefined&&local[m.id]?.home!=="";
         const isKO=m.phase!=="Groupes";
